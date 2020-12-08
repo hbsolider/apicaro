@@ -1,0 +1,34 @@
+{
+  "name": "apicaro",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node main",
+    "dev": "env NODE_ENV=development nodemon main"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hbsolider/apicaro.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/hbsolider/apicaro/issues"
+  },
+  "homepage": "https://github.com/hbsolider/apicaro#readme",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "jsonwebtoken": "^8.5.1",
+    "nodemon": "^2.0.6",
+    "pg": "^8.5.1",
+    "pg-hstore": "^2.3.3",
+    "sequelize": "^6.3.5",
+    "sequelize-cli": "^6.2.0",
+    "socket.io": "^3.0.4"
+  }
+}
