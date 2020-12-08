@@ -1,4 +1,5 @@
 # apicaro
-**npm install**
-**for dev**
- *npm run dev*
+*install
+`npm install`
+*run for dev
+`npm run dev`
