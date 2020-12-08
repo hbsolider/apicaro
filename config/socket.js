@@ -1,7 +1,6 @@
-const { response } = require("express");
 const IO = require("socket.io");
 module.exports = {
-  socketConfig: (app) => {
+  socketConfig: (server) => {
     const io = IO(server, {
       cors: true,
       origin: "*:*",
@@ -11,11 +10,11 @@ module.exports = {
       client.on("client-login", (res) => {
         const { user } = res;
         currentUser.push(user);
-        io.socket.emmit("onlineUser", currentUser);
+        io.sockets.emit("onlineUser", currentUser);
       });
       client.on("clien-logout", (res) => {
         currentUser = currentUser.filter((e) => e.id !== res.id);
-        io.socket.broadcast.emit("onlineUser", currentUser);
+        io.sockets.broadcast.emit("onlineUser", currentUser);
       });
     });
   },
