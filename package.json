@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node main",
+    "start": "node index.js",
     "dev": "env NODE_ENV=development nodemon main"
   },
   "repository": {
@@ -17,7 +17,6 @@
   "bugs": {
     "url": "https://github.com/hbsolider/apicaro/issues"
   },
-  "homepage": "https://github.com/hbsolider/apicaro#readme",
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
