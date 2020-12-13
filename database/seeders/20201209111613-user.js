@@ -11,7 +11,7 @@ module.exports = {
         id:uuidv4(),
         name: `People ${i}`,
         password: newpass,
-        email: `baodeptrai${i}.gmail.com`,
+        email: `baodeptrai${i}@gmail.com`,
         point: 0,
       });
     }
