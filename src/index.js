@@ -1,15 +1,10 @@
-const express = require('express');
 const http = require('http');
-// const socket = require('./config/socket');
-const { sequelize, User } = require('./database/models');
-const app = express();
-const cors = require('cors');
+const { sequelize } = require('./database/models');
+const app = require('./config/express');
 import socketio from 'socket.io';
 import initSockets from 'sockets';
 
 app.enable('trust proxy');
-app.use(express.json());
-app.use(cors(require('./config/cors').cors));
 app.use('/api/user', require('./router/user.router'));
 app.use((error, req, res, next) => {
   res.status(error.status || 500);

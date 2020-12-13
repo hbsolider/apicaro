@@ -3,7 +3,7 @@ const getOnlineList = (io) => {
   io.on("connection", (client) => {
     console.log("Connected: ", client.id);
 
-    client.on("disconnect", function () {
+    client.on("disconnect", () => {
       console.log("Disconnected: ", client.id);
 
       currentUser = currentUser.filter((e) => e.clientId !== client.id);
@@ -17,16 +17,10 @@ const getOnlineList = (io) => {
       io.sockets.emit("onlineUser", currentUser);
     });
 
-    client.on("client-get-list", (res) => {
-      io.sockets.emit("onlineUser", currentUser);
-    });
-
     client.on("client-logout", (res) => {
       const { user } = res;
-      const index = currentUser.findIndex(
-        (item) => user.email === item.email
-      );
-          currentUser.splice(index, 1);
+      const index = currentUser.findIndex((item) => user.email === item.email);
+      currentUser.splice(index, 1);
       io.sockets.emit("onlineUser", currentUser);
     });
   });

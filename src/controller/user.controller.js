@@ -21,7 +21,7 @@ module.exports = {
     res.json({
       success: 'login success',
       token,
-      user: { id: user.id, email: user.email, point: user.point },
+      user: { id: user.id, email: user.email, name: user.name, point: user.point },
     });
   },
   async register(req, res) {
