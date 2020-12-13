@@ -6,9 +6,8 @@ if (process.env.NODE_ENV === 'development') {
 } else {
   origin = 'productio-url-here.com';
 }
-const cors = cors({ credentials: true, origin });
 module.exports = {
   config: (app) => {
-    app.use(cors);
+    app.use(cors({ credentials: true, origin }));
   },
 };
