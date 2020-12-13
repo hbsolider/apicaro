@@ -1,7 +1,7 @@
 const User = require("../database/models").user;
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
-const user = require("../database/models/user");
+const { v4: uuidv4 } = require('uuid');
 module.exports = {
   async getAllUser(req, res) {
     await User.findAll().then((users) => {
@@ -25,7 +25,7 @@ module.exports = {
             process.env.JWT_SECRET
           );
           req.user = user;
-          return res.status(200).json({ success: "login success", token });
+          return res.status(200).json({ success: "login success", token, user });
         }
       }
       return res.status(400).json({error:'account not exist'})
@@ -42,6 +42,7 @@ module.exports = {
         const salt = bcrypt.genSaltSync(12);
         const newpassword = bcrypt.hashSync(password, salt);
         return await User.create({
+          id:uuidv4(),
           email,
           name,
           point,

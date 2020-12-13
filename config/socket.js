@@ -12,10 +12,15 @@ module.exports = {
         currentUser.push(user);
         io.sockets.emit("onlineUser", currentUser);
       });
-      client.on("clien-logout", (res) => {
-        currentUser = currentUser.filter((e) => e.id !== res.id);
-        io.sockets.broadcast.emit("onlineUser", currentUser);
+      client.on("client-logout", (res) => {
+        const { user } = res;
+        currentUser = currentUser.filter((e) => e.email !== user.email);
+        io.sockets.emit("onlineUser", currentUser);
       });
+    });
+
+    io.on("disconnect", (client) => {
+      console.log("id", client.id);
     });
   },
 };

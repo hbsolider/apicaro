@@ -1,6 +1,6 @@
 let origin;
 if(process.env.NODE_ENV==='development'){
-  origin='localhost:3000'
+  origin='http://localhost:3000'
 }else{
   origin='productio-url-here.com'
 }
