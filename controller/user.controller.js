@@ -1,6 +1,8 @@
-const User = require("../database/models").user;
-const jwt = require("jsonwebtoken");
-const bcrypt = require("bcryptjs");
+const User = require('../database/models').user;
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs');
+const { registerValidate } = require('../validator/auth.validator');
+const BadRequest = require('../utils/badRequest');
 const { v4: uuidv4 } = require('uuid');
 module.exports = {
   async getAllUser(req, res) {
@@ -10,63 +12,32 @@ module.exports = {
   },
   async login(req, res) {
     const { email, password } = req.body;
-    await User.findOne({
-      where: {
-        email,
-      },
-    }).then(async (user) => {
-      if (user) {
-        const comparePass = bcrypt.compareSync(password, user.password);
-        if (comparePass) {
-          const token = await jwt.sign(
-            {
-              user,
-            },
-            process.env.JWT_SECRET
-          );
-          req.user = user;
-          return res.status(200).json({ success: "login success", token, user });
-        }
-      }
-      return res.status(400).json({error:'account not exist'})
+    const user = await User.findOne({ where: { email } });
+    if (!user) throw new Error('Email or password is not valid!');
+    const matchPassword = await bcrypt.compare(password, user.password);
+    if (!matchPassword) throw new Error('Password is incorrect!');
+    const token = jwt.sign({ user }, process.env.JWT_SECRET);
+    req.user = user;
+    res.json({
+      success: 'login success',
+      token,
+      user: { id: user.id, email: user.email, point: user.point },
     });
   },
   async register(req, res) {
-    const { email, name, point = 0, password } = req.body;
-    await User.findOne({
-      where: {
-        email,
-      },
-    }).then(async (user) => {
-      if (!user) {
-        const salt = bcrypt.genSaltSync(12);
-        const newpassword = bcrypt.hashSync(password, salt);
-        return await User.create({
-          id:uuidv4(),
-          email,
-          name,
-          point,
-          password: newpassword,
-        }).then((newUser) => {
-          if (!newUser) {
-            return res.status(400).json({ error: "something went wrongs" });
-          }
-          return res.status(201).json({
-            success: "register success",
-            data: {
-              user: {
-                name: newUser.name,
-                email: newUser.email,
-                point: newUser.point,
-              },
-            },
-          });
-        });
-      }
-      return res.status(400).json({ error: "account is existing" });
+    const { value, error } = await registerValidate.validate(req.body);
+    if (error) throw new BadRequest(error);
+    const user = await User.findOne({ where: { email: value.email } });
+    if (user) throw new Error(`acount is exist`);
+    const salt = bcrypt.genSaltSync(10);
+    const newPassword = bcrypt.hashSync(value.password, salt);
+    const newUser = await User.create({
+      id: uuidv4(),
+      ...value,
+      password: newPassword,
     });
+    res.json({ message: 'register success', data: { ...newUser } });
   },
-  async logOut(req, res) {
-  },
+  async logOut(req, res) {},
   async updateInfo(req, res) {},
 };
