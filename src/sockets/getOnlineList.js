@@ -1,27 +1,55 @@
 const getOnlineList = (io) => {
-  let currentUser = [];
-  io.on("connection", (client) => {
-    console.log("Connected: ", client.id);
+  let clients = [];
+  io.on('connection', (socket) => {
+    let userId = '';
 
-    client.on("disconnect", () => {
-      console.log("Disconnected: ", client.id);
+    socket.on('client-connect', ({ user }) => {
+      userId = user.id;
 
-      currentUser = currentUser.filter((e) => e.clientId !== client.id);
-      io.sockets.emit("onlineUser", currentUser);
+      if (clients[userId]) {
+        clients[userId]?.sockets?.push(socket.id);
+      } else {
+        clients[userId] = { info: user, sockets: [socket.id] };
+      }
+
+      const listUser = Object.values(clients).map(({ info }) => ({
+        id: info.id,
+        email: info.email,
+        name: info.name,
+      }));
+      io.sockets.emit('server-send-user-list', { listUser });
     });
 
-    client.on("client-login", (res) => {
-      const { user } = res;
-      const userLogin = { ...user, clientId: client.id };
-      currentUser.push(userLogin);
-      io.sockets.emit("onlineUser", currentUser);
+    socket.on('disconnect', () => {
+      clients[userId].sockets = clients[userId].sockets?.filter(
+        (socketId) => socketId !== socket.id
+      );
+
+      if (clients[userId].sockets && !clients[userId].sockets.length)
+        delete clients[userId];
+
+      const listUser = Object.values(clients).map(({ info }) => ({
+        id: info.id,
+        email: info.email,
+        name: info.name,
+      }));
+      io.sockets.emit('server-send-user-list', { listUser });
     });
 
-    client.on("client-logout", (res) => {
-      const { user } = res;
-      const index = currentUser.findIndex((item) => user.email === item.email);
-      currentUser.splice(index, 1);
-      io.sockets.emit("onlineUser", currentUser);
+    socket.on('client-logout', ({ user }) => {
+      clients[userId].sockets = clients[userId].sockets?.filter(
+        (socketId) => socketId !== socket.id
+      );
+
+      if (clients[userId].sockets && !clients[userId].sockets.length)
+        delete clients[userId];
+
+      const listUser = Object.values(clients).map(({ info }) => ({
+        id: info.id,
+        email: info.email,
+        name: info.name,
+      }));
+      io.sockets.emit('server-send-user-list', { listUser });
     });
   });
 };

@@ -1,9 +1,6 @@
 const chat = (io) => {
-  io.on("connection", (client) => {
-    console.log("Connected: ", client.id);
-    client.on("disconnect", () => {
-      console.log("Disconnected: ", client.id);
-    });
+  io.on('connection', (client) => {
+    client.on('disconnect', () => {});
   });
 };
 
