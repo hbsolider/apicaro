@@ -13,6 +13,7 @@ module.exports = {
       title,
       id: uuidv4(),
       userId: req.user.id,
+      status: 'AVAILABLE',
     }).catch((e) => next(e));
     res.json({
       message: 'create table success',
