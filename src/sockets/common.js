@@ -8,6 +8,24 @@ export const handleConnect = (clients, user, socketId) => {
   return clients;
 };
 
+export const handleCreateRoom = (rooms, user, room, socketId) => {
+  const id = room.id;
+  if (rooms[id]) {
+    rooms[id]?.sockets?.push(socketId);
+  } else {
+    rooms[id] = { info: user, room: room, users: [], sockets: [socketId] };
+  }
+  return rooms;
+};
+
+export const transformRoomInfo = (rooms) => {
+  return Object.values(rooms).map(({ room }) => ({
+    id: room.id,
+    status: room.status,
+    name: room.name,
+  }));
+};
+
 export const transformUserInfo = (clients) => {
   return Object.values(clients).map(({ info }) => ({
     id: info.id,
