@@ -26,6 +26,7 @@ const chat = (io) => {
     socket.on('client-send-message', ({ message }) => {
       messages.push({
         userId,
+        name: clients[userId]?.info?.name ?? 'Anonymous',
         content: message,
         time: moment().format('LT'),
       });
