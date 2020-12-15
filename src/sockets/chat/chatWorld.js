@@ -1,9 +1,9 @@
 import moment from 'moment';
-import { handleConnect, handleDisconnect } from './common';
+import { handleConnect, handleDisconnect } from '../common';
 
 let clients = {};
 let messages = [];
-const chat = (io) => {
+const chatWorld = (io) => {
   io.on('connection', (socket) => {
     let userId = '';
     socket.on('client-connect', ({ user }) => {
@@ -36,4 +36,4 @@ const chat = (io) => {
   });
 };
 
-export default chat;
+export default chatWorld;

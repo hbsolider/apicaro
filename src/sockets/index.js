@@ -1,9 +1,11 @@
 import getOnlineList from './getOnlineList';
-import chat from './chat';
+import chatWorld from './chat/chatWorld';
+import chatRoom from './chat/chatRoom';
 
 const initSockets = (io) => {
   getOnlineList(io);
-  chat(io);
+  chatWorld(io);
+  chatRoom(io);
 };
 
 export default initSockets;
