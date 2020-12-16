@@ -8,7 +8,6 @@ import {
 } from './help';
 const game = (io) => {
   io.on('connection', async (socket) => {
-    console.log('client connect:', { socketId: socket.id });
     const room = await getListBoard();
     socket.on('get-list-room', async () => {
       io.sockets.emit('list-room', room);
