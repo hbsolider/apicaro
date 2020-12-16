@@ -2,9 +2,8 @@ import { board as Board } from '../../database/models';
 
 let Rooms = [];
 let Boards = [];
-let squarePerRow = 16;
+// let squarePerRow = 16;
 let Status = [];
-console.log(Rooms);
 export const getListBoard = async () => {
   try {
     return await Board.findAll();
@@ -12,54 +11,70 @@ export const getListBoard = async () => {
     console.log(error);
   }
 };
+export const clientDisconnet = (socketId) => {
+  let rooms = Rooms.filter((r) => {
+    return r.socketId === socketId;
+  });
+  if (rooms.length === 0) {
+    Boards = Boards.filter((board) => board.room !== rooms.room);
+    return Rooms;
+  }
+  Rooms = rooms;
+  return Rooms;
+};
 export const clientJoin = (socketId, { user, room }) => {
-  const checkUserHaveInRoom = () => {
-    for (let i = 0; i < Rooms.length; i++) {
-      if (Rooms[i].user.id === user.id) return { have: true, index: i };
-    }
-    return { have: false, index: null };
-  };
-  const { have, index } = checkUserHaveInRoom();
-  const turn = Rooms.length % 2 === 0 ? 'x' : 'o';
-  if (!have) {
-    Rooms.push({ socketId, user, room, turn });
+  const checkRoom = Rooms.filter((r) => r.room === room);
+  const checkUser = Rooms.filter((r) => r.user.id === user.id);
+  let newUser = (turn) => ({ user: { turn: turn, ...user }, room, socketId });
+  if (checkRoom.length === 0) {
+    Rooms.push(newUser('x'));
+    CreateBoard(room);
     return Rooms[Rooms.length - 1];
-  }
-  Rooms[index].socketId = socketId;
-  return Rooms[index];
-};
-export const CreateBoard = (room) => {
-  const checkBoardExist = () => {
-    for (let i = 0; i < Boards.length; i++) {
-      if (Boards.room === room) return { have: true, index: i };
+  } else {
+    if (checkUser.length === 0) {
+      if (checkRoom.length === 1) {
+        Rooms.push(newUser('o'));
+      } else {
+        Rooms.push(newUser(null));
+      }
+      return Rooms[Rooms.length - 1];
+    } else {
+      const index = Rooms.findIndex((r) => r.user.id === user.id);
+      Rooms[index].socketId = socketId;
+      return Rooms[index];
     }
-    return { have: false, index: null };
-  };
-  const { have, index } = checkBoardExist();
-  let arr = Array(16 * 16).fill(null);
-  if (!have) {
-    Status.push({ room, xIsNext: true });
-    Boards.push({ room, data: arr });
-    return Boards[Boards.length - 1];
   }
-  return Boards[index];
 };
-export const currentClient = (socketId) => {
-  const room = Rooms.find((room) => room.socketId === socketId);
+const CreateBoard = (room) => {
+  const checkBoardExist = Boards.filter((board) => board.room === room);
+  if (checkBoardExist.length === 0) {
+    const data = Array(16 * 16).fill(null);
+    Boards.push({ room, data, xIsNext: true });
+  }
+};
+export const getCurrentBoard = (room) => {
+  const boards = Boards.filter((board) => board.room === room);
+  return boards[0];
+};
+export const currentClient = (userId) => {
+  const room = Rooms.find((room) => room.user.id === userId);
   if (room) return { have: true, data: room };
   return { have: false, data: null };
 };
 export const ChessAtPosition = ({ room, turn, position }) => {
-  const currentBoard = Boards.find((b) => b.room === room);
-  const status = Status.find((s) => s.room === room);
-  console.log(turn, status.xIsNext);
-  // if (status.xIsNext) {
-  //   if (turn === 'o') return currentBoard.data;
-  // }
-  let tempTurn = status.xIsNext ? 'x' : 'o';
-  console.log('temp turn', tempTurn, Rooms.length);
-  if (turn !== tempTurn) return currentBoard.data;
-  currentBoard.data[position] = tempTurn;
-  status.xIsNext = !status.xIsNext;
-  return currentBoard.data;
+  let current = Boards.findIndex((board) => board.room === room);
+  if (current !== -1) {
+    let xIsNext = Boards[current].xIsNext;
+    if (Boards[current].data[position] === null) {
+      if (xIsNext && turn === 'x') {
+        Boards[current].data[position] = 'x';
+        Boards[current].xIsNext = false;
+      } else if (!xIsNext && turn === 'o') {
+        Boards[current].data[position] = 'o';
+        Boards[current].xIsNext = true;
+      }
+    }
+    return Boards[current];
+  }
+  return null;
 };
