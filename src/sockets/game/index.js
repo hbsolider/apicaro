@@ -18,20 +18,26 @@ const game = (io) => {
     });
     socket.on('join-room', (data) => {
       const client = clientJoin(socket.id, data);
-      const currentBoards = getCurrentBoard(client.room);
-      socket.join(client.room);
-      io.to(client.room).emit('get-boards', currentBoards.data);
+      if (client) {
+        const currentBoards = getCurrentBoard(client.room);
+        socket.join(client.room);
+        io.to(currentBoards.room).emit('get-boards', currentBoards.data);
+      }
     });
-    socket.on('play-chess', (position, user) => {
-      const { have, data } = currentClient(user.id);
+    socket.on('play-chess', (position, room) => {
+      const { have, data } = currentClient(socket.id, room);
       if (have) {
         const board = ChessAtPosition({
           position,
           room: data.room,
           turn: data.user.turn,
         });
-        if (board !== null) {
-          io.to(data.room).emit('get-boards', board.data);
+        if (board.data !== null) {
+          io.to(data.room).emit('get-boards', board.data.data);
+        }
+        if (board.winner !== null) {
+          console.log(board.winner);
+          io.to(data.room).emit('get-status', board.winner);
         }
       }
     });
