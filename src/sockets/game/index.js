@@ -1,36 +1,38 @@
 import {
   ChessAtPosition,
-  CreateBoard,
   clientJoin,
   getListBoard,
   currentClient,
+  clientDisconnet,
+  getCurrentBoard,
 } from './help';
 const game = (io) => {
   io.on('connection', async (socket) => {
-    console.log('client connect', socket.id);
+    console.log('client connect:', { socketId: socket.id });
     const room = await getListBoard();
     socket.on('get-list-room', async () => {
       io.sockets.emit('list-room', room);
     });
     socket.on('disconnect', () => {
-      console.log('client disconnet', socket.id);
+      clientDisconnet(socket.id);
     });
     socket.on('join-room', (data) => {
       const client = clientJoin(socket.id, data);
-      const currentBoards = CreateBoard(client.room);
+      const currentBoards = getCurrentBoard(client.room);
       socket.join(client.room);
-      // socket.broadcast.emit('get-boards', currentBoards.data);
+      io.to(client.room).emit('get-boards', currentBoards.data);
     });
-    socket.on('play-chess', (position) => {
-      const { have, data } = currentClient(socket.id);
-      console.log({ have, data });
+    socket.on('play-chess', (position, user) => {
+      const { have, data } = currentClient(user.id);
       if (have) {
         const board = ChessAtPosition({
           position,
           room: data.room,
-          turn: data.turn,
+          turn: data.user.turn,
         });
-        io.to(data.room).emit('get-boards', board);
+        if (board !== null) {
+          io.to(data.room).emit('get-boards', board.data);
+        }
       }
     });
   });
