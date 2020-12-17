@@ -90,12 +90,15 @@ export const ChessAtPosition = ({ room, turn, position }) => {
         Boards[current].data[position] = 'o';
         Boards[current].xIsNext = true;
       }
+      const array2d = ChangeTo2D(Boards[current].data);
+      console.log(array2d);
+      const y = Math.floor(position / maxLength);
+      const x = position % maxLength;
+      console.log(checkEndGame(array2d, x, y));
+      if (checkEndGame(array2d, x, y)) {
+        winner = xIsNext ? 'Winner O' : 'Winner X';
+      }
     }
-    const array2d = ChangeTo2D(Boards[current].data);
-    const y = Math.floor(position / maxLength);
-    const x = position % maxLength;
-    console.log(x, y);
-    console.log(checkEndGame(array2d, x, y));
     return { data: Boards[current], winner };
   }
   return { data: null, winner };

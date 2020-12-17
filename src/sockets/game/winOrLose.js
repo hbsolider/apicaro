@@ -47,7 +47,7 @@ export const checkEndGame = (data, x, y) => {
 export const ChangeTo2D = (data) => {
   let result = [];
   for (let i = 0; i < maxLength; i++) {
-    result.push(data.slice(i, i + maxLength));
+    result.push(data.slice(i*maxLength, i*maxLength + maxLength));
   }
   return result;
 };
