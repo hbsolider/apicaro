@@ -1,7 +1,7 @@
-'use strict';
+"use strict";
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.createTable('users', {
+    await queryInterface.createTable("Users", {
       id: {
         allowNull: false,
         primaryKey: true,
@@ -31,14 +31,21 @@ module.exports = {
         type: Sequelize.DATE,
         defaultValue: Sequelize.NOW,
       },
-      avatar: {
-        type: Sequelize.STRING,
-        defaultValue:
-          'https://www.alliancerehabmed.com/wp-content/uploads/icon-avatar-default.png',
+      isAdmin: {
+        allowNull: false,
+        type: Sequelize.BOOLEAN,
+      },
+      isActivated: {
+        allowNull: false,
+        type: Sequelize.BOOLEAN,
+      },
+      isBlocked: {
+        allowNull: false,
+        type: Sequelize.BOOLEAN,
       },
     });
   },
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.dropTable('users');
+    await queryInterface.dropTable("Users");
   },
 };
