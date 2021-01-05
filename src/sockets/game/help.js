@@ -1,4 +1,3 @@
-import { board as Board } from '../../database/models';
 import { ChangeTo2D, checkEndGame } from './winOrLose';
 let Rooms = [];
 let Boards = [];

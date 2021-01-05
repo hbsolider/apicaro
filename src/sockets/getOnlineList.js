@@ -1,27 +1,24 @@
-import { handleConnect, transformUserInfo, handleDisconnect } from './common';
+import { onlineUserList } from './storage';
 
-let clients = {};
 const getOnlineList = (io) => {
   io.on('connection', (socket) => {
-    let userId = '';
-
     socket.on('client-connect', ({ user }) => {
-      userId = user.id;
-      clients = handleConnect(clients, user, socket.id);
-      const listUser = transformUserInfo(clients);
-      io.sockets.emit('server-send-user-list', { listUser });
+      socket.user = user;
+      onlineUserList.add(user, socket.id);
+      const userList = onlineUserList.transform(['id', 'email', 'name']);
+      io.sockets.emit('server-send-user-list', { userList });
     });
 
     socket.on('disconnect', () => {
-      clients = handleDisconnect(clients, userId, socket.id);
-      const listUser = transformUserInfo(clients);
-      io.sockets.emit('server-send-user-list', { listUser });
+      if (socket.user) onlineUserList.remove(socket.user, socket.id);
+      const userList = onlineUserList.transform(['id', 'email', 'name']);
+      io.sockets.emit('server-send-user-list', { userList });
     });
 
-    socket.on('client-logout', ({ user }) => {
-      clients = handleDisconnect(clients, userId, socket.id);
-      const listUser = transformUserInfo(clients);
-      io.sockets.emit('server-send-user-list', { listUser });
+    socket.on('client-logout', () => {
+      if (socket.user) onlineUserList.remove(socket.user, socket.id);
+      const userList = onlineUserList.transform(['id', 'email', 'name']);
+      io.sockets.emit('server-send-user-list', { userList });
     });
   });
 };

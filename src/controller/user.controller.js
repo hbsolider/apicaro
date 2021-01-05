@@ -1,4 +1,4 @@
-const User = require('../database/models').user;
+const { User } = require('../database/models');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const { registerValidate } = require('../validator/auth.validator');
