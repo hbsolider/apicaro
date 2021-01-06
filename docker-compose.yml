@@ -1,0 +1,25 @@
+version: '3.8'
+
+services:
+  server:
+    image: nakfl/online-caro-back-end:latest
+    depends_on:
+      - database
+    environment:
+      NODE_ENV: development
+      DEV_DATABASE_URL: postgres://postgres:password@database:5432/online-caro
+      DATABASE_DIALECT: postgres
+      PORT: 6969
+      JWT_SECRET: anhem1nha
+      JWT_EXPIRATION_MINUTES: 30
+      JWT_REFRESH_EXPIRATION_DAYS: 30
+    command: sh -c "./wait-for-it.sh database:5432 && npm run migrate && npm start"
+    ports:
+      - 6969:6969
+
+  database:
+    image: postgres:13
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: online-caro
