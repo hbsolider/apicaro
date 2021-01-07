@@ -12,6 +12,6 @@ if (process.env.NODE_ENV === 'development') {
 }
 module.exports = {
   config: (app) => {
-    app.use(cors({ credentials: true, origin }));
+    app.use(cors());
   },
 };
