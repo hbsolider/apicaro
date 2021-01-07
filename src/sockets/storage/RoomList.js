@@ -1,4 +1,5 @@
-import { pick } from 'utils/common';
+import { pick } from "utils/common";
+import { roomService } from "service";
 
 class RoomList {
   constructor() {
@@ -19,6 +20,7 @@ class RoomList {
 
   add(room) {
     if (room?.id) this.rooms[room.id] = { ...room };
+    roomService.createOne(room);
   }
 
   remove(roomId) {
@@ -27,6 +29,10 @@ class RoomList {
 
   transform(keys) {
     return Object.values(this.rooms).map((room) => pick(room, keys));
+  }
+
+  updateViewingList(roomId, user) {
+    return this.rooms[roomId]?.updateViewingList(user);
   }
 }
 

@@ -1,11 +1,13 @@
 class Room {
-  constructor(id, name, createdBy) {
+  constructor(id, joinId, name, user) {
     this.id = id;
+    this.joinId = joinId;
     this.name = name;
-    this.createdBy = createdBy;
-    this.firstPlayer = null;
+    this.createdBy = user.id;
+    this.firstPlayer = user;
     this.secondPlayer = null;
-    this.password = '';
+    this.password = "";
+    this.status = "WAITING";
     this.timePerStep = 30;
     this.viewingList = [];
   }
@@ -33,6 +35,20 @@ class Room {
       return this;
     }
     this.viewingList = this.viewingList.filter((user) => user.id !== userId);
+    return this;
+  }
+
+  updateViewingList(user) {
+    if (this.viewingList.find((item) => item.id === user.id)||this.firstPlayer?.id === user.id||this.secondPlayer?.id === user.id) {
+      return this;
+    }
+    if (this.firstPlayer?.id === user.id) {
+      return this;
+    }
+    if (this.secondPlayer?.id === user.id) {
+      return this;
+    }
+    this.viewingList.push(user);
     return this;
   }
 }
