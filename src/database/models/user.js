@@ -20,6 +20,11 @@ module.exports = (sequelize, DataTypes) => {
       email: DataTypes.STRING,
       password: DataTypes.STRING,
       point: DataTypes.STRING,
+      avatar: {
+        type: DataTypes.BOOLEAN,
+        defaultValue:
+          'https://www.alliancerehabmed.com/wp-content/uploads/icon-avatar-default.png',
+      },
       isAdmin: { type: DataTypes.BOOLEAN, defaultValue: false },
       isActivated: { type: DataTypes.BOOLEAN, defaultValue: false },
       isBlocked: { type: DataTypes.BOOLEAN, defaultValue: false },

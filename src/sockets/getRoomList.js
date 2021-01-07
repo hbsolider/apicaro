@@ -1,43 +1,50 @@
-import { roomList } from "./storage";
-import Room from "./storage/Room";
-import { v4 as uuidv4 } from "uuid";
+import { onlineUserList, roomList } from './storage';
+import Room from './storage/Room';
+
 const getRoomList = (io) => {
-  io.on("connection", (socket) => {
-    socket.on("disconnect", () => {
-      //   rooms = handleDisconnect(rooms, roomId, socket.id);
+  io.on('connection', (socket) => {
+    socket.on('disconnect', () => {
+      const user = onlineUserList.getUserBySocketId(socket.id);
+      if (user?.status === 'WAITING') {
+        if (user.sockets.length === 1) {
+          const roomPanel = roomList.leaveRoom(user.inRoom, user);
+          io.to(user.inRoom).emit('server-send-leave-room', { roomPanel });
+        }
+      }
     });
-    socket.on("client-create-room", ({ user, room }) => {
-      const roomCreated = new Room(uuidv4(), room.joinId, room.name, user);
+
+    socket.on('client-leave-room', ({ room }) => {
+      const user = onlineUserList.getUserBySocketId(socket.id);
+      const roomPanel = roomList.leaveRoom(room.id, user);
+      socket.leave(room.id);
+      io.to(room.id).emit('server-send-leave-room', { roomPanel });
+    });
+
+    socket.on('client-create-room', ({ room }) => {
+      const user = onlineUserList.getUserBySocketId(socket.id);
+      const roomCreated = new Room(room.id, room.joinId, room.name, user);
       roomList.add(roomCreated);
-      io.sockets.emit("server-send-room-list", {
+      socket.join(room.id);
+      io.sockets.emit('server-send-room-list', {
         listRoom: roomList.transform(),
       });
     });
-    socket.on("client-get-rooms", () => {
+
+    socket.on('client-get-rooms', () => {
       const listRoom = roomList.transform();
-      io.sockets.emit("server-send-room-list", { listRoom });
+      io.sockets.emit('server-send-room-list', { listRoom });
     });
-    socket.on("client-join-wait-room", ({ roomId, user }) => {
-      roomList.updateViewingList(roomId, user);
-      const listRoom = roomList.transform();
-      io.sockets.emit("server-send-room-list", { listRoom });
-      //   roomId = roomId;
-      //   if (rooms[roomId]) {
-      //     rooms[roomId].sockets?.push(socket.id);
-      //     rooms[roomId].users?.push(user);
-      //     const userInRoom = rooms[roomId].users?.length;
-      //     if (userInRoom < 2) {
-      //       socket.join(roomId);
-      //       rooms[roomId].room.status = "AVAILABLE";
-      //     } else rooms[roomId].room.status = "PLAYING";
-      //     const listRoom = transformRoomInfo(rooms);
-      //     io.sockets.emit("server-send-room-list", { listRoom });
-      //     io.to(roomId).emit("server-send-join-user", {
-      //       guestUser: user,
-      //       hostUser: rooms[roomId]?.info,
-      //       room: rooms[roomId]?.room,
-      //     });
-      //   }
+
+    socket.on('client-join-wait-room', ({ roomId }) => {
+      const user = onlineUserList.getUserBySocketId(socket.id);
+      const isJoinRoomSuccess = user.joinRoom(roomId);
+
+      if (isJoinRoomSuccess) {
+        roomList.updateViewingList(roomId, user);
+        const roomPanel = roomList.getById(roomId);
+        socket.join(roomId);
+        io.to(roomId).emit('server-send-join-user', { roomPanel });
+      } else socket.emit('server-send-in-room', { inRoom: user.inRoom });
     });
   });
 };

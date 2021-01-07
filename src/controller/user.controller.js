@@ -18,16 +18,11 @@ module.exports = {
     if (!matchPassword) throw new Error('Password is incorrect!');
     const token = jwt.sign({ user }, process.env.JWT_SECRET);
     req.user = user;
+    delete user.password;
     res.json({
       success: 'login success',
       token,
-      user: {
-        id: user.id,
-        email: user.email,
-        name: user.name,
-        point: user.point,
-        avatar: user.avatar,
-      },
+      user,
     });
   },
   async register(req, res) {

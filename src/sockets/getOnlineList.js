@@ -1,10 +1,12 @@
-import { onlineUserList } from './storage';
+import { onlineUserList, roomList } from './storage';
+import User from './storage/User';
 
 const getOnlineList = (io) => {
   io.on('connection', (socket) => {
     socket.on('client-connect', ({ user }) => {
       socket.user = user;
-      onlineUserList.add(user, socket.id);
+      const clientUser = new User(user);
+      onlineUserList.add(clientUser, socket.id);
       const userList = onlineUserList.transform(['id', 'email', 'name']);
       io.sockets.emit('server-send-user-list', { userList });
     });
