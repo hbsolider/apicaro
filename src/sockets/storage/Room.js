@@ -6,8 +6,8 @@ class Room {
     this.createdBy = user.id;
     this.firstPlayer = user;
     this.secondPlayer = null;
-    this.password = "";
-    this.status = "WAITING";
+    this.password = '';
+    this.status = 'WAITING';
     this.timePerStep = 30;
     this.viewingList = [];
   }
@@ -39,17 +39,21 @@ class Room {
   }
 
   updateViewingList(user) {
-    if (this.viewingList.find((item) => item.id === user.id)||this.firstPlayer?.id === user.id||this.secondPlayer?.id === user.id) {
-      return this;
-    }
-    if (this.firstPlayer?.id === user.id) {
-      return this;
-    }
-    if (this.secondPlayer?.id === user.id) {
+    if (
+      this.viewingList.find((item) => item.id === user.id) ||
+      this.firstPlayer?.id === user.id ||
+      this.secondPlayer?.id === user.id
+    ) {
       return this;
     }
     this.viewingList.push(user);
     return this;
+  }
+
+  getUserById(userId) {
+    if (this.firstPlayer?.id === userId) return this.firstPlayer;
+    if (this.secondPlayer?.id === userId) return this.secondPlayer;
+    return this.viewingList.find((item) => item.id === userId);
   }
 }
 

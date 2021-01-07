@@ -30,7 +30,8 @@ class OnlineUserList {
         ...new Set([...this.users[id].sockets, socketId]),
       ];
     } else {
-      this.users[id] = { ...user, sockets: [socketId] };
+      user.sockets.push(socketId);
+      this.users[id] = user;
     }
     return this.users;
   }
