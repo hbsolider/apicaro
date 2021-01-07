@@ -1,14 +1,14 @@
-import { Room } from 'database/models';
-import { v4 as uuidv4 } from 'uuid';
+import { Room } from "database/models";
 
 const roomService = {};
 
 roomService.createOne = async (data) => {
-  const { name } = data;
-  const room = await Room.findOne({ where: { name } });
-  if (room) throw new Error('Room name already exists');
-  const newRoom = await Room.create({ ...data, id: uuidv4() });
-
+  const { id, name, createdBy } = data;
+  const newRoom = await Room.create({
+    id,
+    name,
+    createdBy,
+  });
   return newRoom;
 };
 
