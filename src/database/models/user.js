@@ -18,9 +18,12 @@ module.exports = (sequelize, DataTypes) => {
       name: DataTypes.STRING,
       email: DataTypes.STRING,
       password: DataTypes.STRING,
-      point: DataTypes.STRING,
+      point: {
+        type: DataTypes.INTEGER,
+        defaultValue: 0,
+      },
       avatar: {
-        type: DataTypes.BOOLEAN,
+        type: DataTypes.STRING,
         defaultValue:
           'https://www.alliancerehabmed.com/wp-content/uploads/icon-avatar-default.png',
       },

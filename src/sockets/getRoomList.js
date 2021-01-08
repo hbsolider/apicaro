@@ -5,8 +5,8 @@ const getRoomList = (io) => {
   io.on('connection', (socket) => {
     socket.on('disconnect', () => {
       const user = onlineUserList.getUserBySocketId(socket.id);
-      if (user?.status === 'WAITING') {
-        if (user.sockets.length === 1) {
+      if (user?.status !== 'PLAYING') {
+        if (user?.sockets.length === 1) {
           const roomPanel = roomList.leaveRoom(user.inRoom, user);
           io.to(user.inRoom).emit('server-send-leave-room', { roomPanel });
         }

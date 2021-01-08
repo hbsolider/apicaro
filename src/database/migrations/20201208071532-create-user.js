@@ -21,7 +21,7 @@ module.exports = {
         type: Sequelize.STRING,
       },
       point: {
-        type: Sequelize.STRING,
+        type: Sequelize.INTEGER,
       },
       createdAt: {
         type: Sequelize.DATE,

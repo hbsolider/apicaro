@@ -5,7 +5,7 @@ class User {
     this.email = email;
     this.point = point;
     this.avatar = avatar;
-    this.status = 'WAITING';
+    this.status = 'ONLINE';
     this.inRoom = '';
     this.sockets = [];
   }

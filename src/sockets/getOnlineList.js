@@ -7,19 +7,19 @@ const getOnlineList = (io) => {
       socket.user = user;
       const clientUser = new User(user);
       onlineUserList.add(clientUser, socket.id);
-      const userList = onlineUserList.transform(['id', 'email', 'name']);
+      const userList = onlineUserList.transform();
       io.sockets.emit('server-send-user-list', { userList });
     });
 
     socket.on('disconnect', () => {
       if (socket.user) onlineUserList.remove(socket.user, socket.id);
-      const userList = onlineUserList.transform(['id', 'email', 'name']);
+      const userList = onlineUserList.transform();
       io.sockets.emit('server-send-user-list', { userList });
     });
 
     socket.on('client-logout', () => {
       if (socket.user) onlineUserList.remove(socket.user, socket.id);
-      const userList = onlineUserList.transform(['id', 'email', 'name']);
+      const userList = onlineUserList.transform();
       io.sockets.emit('server-send-user-list', { userList });
     });
   });
