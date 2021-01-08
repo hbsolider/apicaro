@@ -30,6 +30,10 @@ module.exports = (sequelize, DataTypes) => {
       isAdmin: { type: DataTypes.BOOLEAN, defaultValue: false },
       isActivated: { type: DataTypes.BOOLEAN, defaultValue: false },
       isBlocked: { type: DataTypes.BOOLEAN, defaultValue: false },
+      createdAt: {
+        type: DataTypes.DATE,
+        defaultValue: new Date(),
+      },
     },
     {
       sequelize,
