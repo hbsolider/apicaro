@@ -34,6 +34,12 @@ module.exports = {
       avatar: {
         type: Sequelize.STRING,
       },
+      google: {
+        type: Sequelize.STRING,
+      },
+      facebook: {
+        type: Sequelize.STRING,
+      },
       isAdmin: {
         allowNull: false,
         type: Sequelize.BOOLEAN,

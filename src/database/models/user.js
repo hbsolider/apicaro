@@ -1,5 +1,7 @@
 'use strict';
-const { Model } = require('sequelize');
+import bcrypt from 'bcryptjs';
+import { exclude } from 'utils/common';
+const { Model, Op } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
   class User extends Model {
     static associate(models) {
@@ -18,6 +20,8 @@ module.exports = (sequelize, DataTypes) => {
       name: DataTypes.STRING,
       email: DataTypes.STRING,
       password: DataTypes.STRING,
+      google: DataTypes.STRING,
+      facebook: DataTypes.STRING,
       point: {
         type: DataTypes.INTEGER,
         defaultValue: 0,
@@ -40,5 +44,36 @@ module.exports = (sequelize, DataTypes) => {
       modelName: 'User',
     }
   );
+
+  User.addHook('beforeSave', async function (user) {
+    if (user.changed('password')) {
+      user.password = await bcrypt.hash(user.password, 12);
+    }
+  });
+
+  User.isEmailTaken = async function (email, excludeUserId = null) {
+    const user = await this.findOne({
+      where: {
+        [Op.and]: [
+          { email },
+          {
+            id: {
+              [Op.ne]: excludeUserId,
+            },
+          },
+        ],
+      },
+    });
+    return !!user;
+  };
+  User.prototype.isPasswordMatch = async function (password) {
+    return bcrypt.compare(password, this.password);
+  };
+
+  User.prototype.transform = function () {
+    const excludedFields = ['password'];
+    return exclude(this, excludedFields);
+  };
+
   return User;
 };

@@ -1,29 +1,43 @@
-const jwt = require("jsonwebtoken");
-const User = require("../database/models").user;
+import passport from 'passport';
+import httpStatus from 'http-status';
+import ApiError from 'utils/ApiError';
+import { userService } from 'service';
 
-async function auth(req, res, next) {
-  if (!req.header("Authorization")) throw new Error('Token is must required')
-  try {
-    const token = req.header("Authorization").replace("Bearer ", "");
-    const data = jwt.verify(token, process.env.JWT_SECRET);
-    const user = await User.findOne({
-        where:{
-            id:data.user.id
-        }
-    })
-    if(!user) throw new Error('Invalid token')
-    req.user=user;
-    // .then((user) => {
-    //   if (!user) {
-    //     return res.status(401).json({ message: "Unauthenticated" });
-    //   }
-    //   req.user = user;
-    //   req.token = token;
-    // });
-    next();
-  } catch (error) {
-    next(error)
+const verifyCallback = (req, resolve, reject, requiredRoles) => async (
+  err,
+  user,
+  info
+) => {
+  if (err || info || !user) {
+    return reject(new ApiError(httpStatus.UNAUTHORIZED, 'Please authenticate'));
   }
-}
 
-module.exports = auth;
+  req.user = user;
+
+  if (requiredRoles.length) {
+    const userRoles = await userService.getRolesFromId(user.id);
+    const isAuthorized = requiredRoles.some((requiredRole) => {
+      return userRoles.includes(requiredRole);
+    });
+    if (!isAuthorized && req.params.userId !== user.id) {
+      return reject(new ApiError(httpStatus.FORBIDDEN, 'Forbidden'));
+    }
+  }
+
+  resolve();
+};
+
+export const auth = (...requiredRoles) => async (req, res, next) => {
+  return new Promise((resolve, reject) => {
+    passport.authenticate(
+      'jwt',
+      { session: false },
+      verifyCallback(req, resolve, reject, requiredRoles)
+    )(req, res, next);
+  })
+    .then(() => next())
+    .catch((err) => next(err));
+};
+
+export const oAuth = (service) =>
+  passport.authenticate(service, { session: false });
