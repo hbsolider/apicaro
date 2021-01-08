@@ -16,6 +16,9 @@ class User {
     }
     return false;
   }
+  isInAnotherRoom() {
+    return !!this.inRoom;
+  }
 }
 
 export default User;

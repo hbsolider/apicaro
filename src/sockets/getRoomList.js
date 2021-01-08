@@ -22,13 +22,23 @@ const getRoomList = (io) => {
 
     socket.on('client-create-room', ({ room }) => {
       const user = onlineUserList.getUserBySocketId(socket.id);
-      const roomCreated = new Room(room.id, room.joinId, room.name, user);
-      roomList.add(roomCreated);
-      socket.join(room.id);
-      io.sockets.emit('server-send-room-list', {
-        listRoom: roomList.transform(),
-      });
+      const isInAnotherRoom = user.isInAnotherRoom();
+      if (!isInAnotherRoom) {
+        const roomCreated = new Room(room.id, room.joinId, room.name, user);
+        roomList.add(roomCreated);
+        socket.join(room.id);
+        io.sockets.emit('server-send-room-list', {
+          listRoom: roomList.transform(),
+        });
+      } else socket.emit('server-send-in-room', { inRoom: user.inRoom });
     });
+
+    // socket.on('client-check-in-room', ({ room }) => {
+    //   const user = onlineUserList.getUserBySocketId(socket.id);
+    //   const isInAnotherRoom = user.isInAnotherRoom();
+    //   const inRoom = isInAnotherRoom ? user.inRoom : '';
+    //   socket.emit('server-send-in-room', { inRoom });
+    // });
 
     socket.on('client-get-rooms', () => {
       const listRoom = roomList.transform();
