@@ -1,5 +1,5 @@
 import httpStatus from 'http-status';
-import ApiError from 'utils/ApiError';
+import ApiError from '../utils/ApiError';
 
 export const errorHandler = (err, req, res) => {
   const { statusCode, message } = err;
