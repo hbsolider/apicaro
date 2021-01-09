@@ -11,6 +11,11 @@ const getOnlineList = (io) => {
       io.sockets.emit('server-send-user-list', { userList });
     });
 
+    socket.on('client-update-users-status', () => {
+      const userList = onlineUserList.transform();
+      io.sockets.emit('server-send-user-list', { userList });
+    });
+
     socket.on('disconnect', () => {
       if (socket.user) onlineUserList.remove(socket.user, socket.id);
       const userList = onlineUserList.transform();

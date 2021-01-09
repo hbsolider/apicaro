@@ -55,6 +55,18 @@ class Room {
     if (this.secondPlayer?.id === userId) return this.secondPlayer;
     return this.viewingList.find((item) => item.id === userId);
   }
+
+  getAllUserInRoom() {
+    const users = [];
+    if (this.firstPlayer) {
+      users.push(this.firstPlayer);
+    }
+    if (this.secondPlayer) {
+      users.push(this.secondPlayer);
+    }
+    users.push(...this.viewingList);
+    return users;
+  }
 }
 
 export default Room;
