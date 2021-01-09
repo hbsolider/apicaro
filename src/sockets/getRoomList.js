@@ -5,23 +5,18 @@ const getRoomList = (io) => {
   io.on('connection', (socket) => {
     socket.on('disconnect', () => {
       const user = onlineUserList.getUserBySocketId(socket.id);
-      if (user?.status === 'WAITING') {
-        // if (user?.inRoom) {
-        //   const roomPanel = roomList.leaveRoom(user.inRoom, user);
-        //   user.leaveRoom();
-        //   socket.leave(user.inRoom);
-        //   io.to(user.inRoom).emit('server-send-leave-room', { roomPanel });
-        //   const userConnects = user.sockets;
-        //   userConnects.forEach((connect) => {
-        //     io.to(connect).emit('server-send-leaved-room', {
-        //       isLeaveRoom: true,
-        //     });
-        //   });
-        // }
       if (user?.status !== 'PLAYING') {
-        if (user?.sockets.length === 1) {
+        if (user?.inRoom) {
           const roomPanel = roomList.leaveRoom(user.inRoom, user);
+          user.leaveRoom();
+          socket.leave(user.inRoom);
           io.to(user.inRoom).emit('server-send-leave-room', { roomPanel });
+          const userConnects = user.sockets;
+          userConnects.forEach((connect) => {
+            io.to(connect).emit('server-send-leaved-room', {
+              isLeaveRoom: true,
+            });
+          });
         }
       }
     });
