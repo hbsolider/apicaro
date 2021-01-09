@@ -16,8 +16,11 @@ class User {
     }
     return false;
   }
-  isInAnotherRoom() {
-    return !!this.inRoom;
+  isInAnotherRoom(roomId) {
+    return !!(this.inRoom && this.inRoom !== roomId);
+  }
+  leaveRoom() {
+    this.inRoom = '';
   }
 }
 
