@@ -10,12 +10,12 @@ const user = [...Array(50)].map(() => ({
   email: faker.internet.email(),
   password: defaultPassword,
   name: `${faker.name.firstName()} ${faker.name.lastName()}`,
-  // avatar:
-  //   'https://www.alliancerehabmed.com/wp-content/uploads/icon-avatar-default.png',
+  avatar:
+    'https://www.alliancerehabmed.com/wp-content/uploads/icon-avatar-default.png',
   isAdmin: false,
   isActivated: false,
   isBlocked: false,
-  point: 0,
+  point: faker.random.number(),
   createdAt: new Date(),
   updatedAt: new Date(),
 }));

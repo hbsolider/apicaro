@@ -77,7 +77,7 @@ userService.oAuthLogin = async ({ service, id, email, name, avatar }) => {
   });
 };
 
-userService.updateInfomation = async (data) => {
+userService.updateInformation = async (data) => {
   if (Object.keys(data).length !== 0) {
     const user = await User.findOne({ where: { id: data.id } });
     if (Object.keys(data).includes('point')) {
@@ -89,12 +89,20 @@ userService.updateInfomation = async (data) => {
   }
   return null;
 };
+
 userService.getHistoryGame = async ({ id }) => {
   return await Game.findAll({
     attributes: ['playerFirst', 'playerSecond', 'userWin'],
     where: {
       [Op.or]: [{ playerFirst: id }, { playerSecond: id }],
     },
+  });
+};
+
+userService.getListUserOrderByRank = async () => {
+  return await User.findAll({
+    limit: 10,
+    order: [['point', 'DESC']],
   });
 };
 export default userService;

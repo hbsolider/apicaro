@@ -9,6 +9,7 @@ messageService.createOne = async (data) => {
 
 messageService.getManyByRoomId = async (roomId) => {
   const messages = await Message.findAll({
+    order: [['createdAt', 'ASC']],
     include: [
       {
         model: User,
