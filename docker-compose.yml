@@ -7,7 +7,7 @@ services:
       - database
     environment:
       NODE_ENV: development
-      DEV_DATABASE_URL: postgres://postgres:password@database:5432/online-caro
+      DATABASE_URL: postgres://postgres:password@database:5432/online-caro
       DATABASE_DIALECT: postgres
       PORT: 6969
       JWT_SECRET: anhem1nha
