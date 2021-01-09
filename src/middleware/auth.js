@@ -16,6 +16,7 @@ const verifyCallback = (req, resolve, reject, requiredRoles) => async (
 
   if (requiredRoles.length) {
     const userRoles = await userService.getRolesFromId(user.id);
+    console.log('🚀 ~ file: auth.js ~ line 19 ~ userRoles', userRoles);
     const isAuthorized = requiredRoles.some((requiredRole) => {
       return userRoles.includes(requiredRole);
     });

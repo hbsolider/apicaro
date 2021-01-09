@@ -40,7 +40,7 @@ userService.createUser = async (userBody) => {
 };
 
 userService.getRolesFromId = async (id) => {
-  const user = await getUserById(id);
+  const user = await User.findByPk(id);
   const roles = [ROLES.USER];
   if (user.isAdmin) roles.push(ROLES.ADMIN);
   return roles;
@@ -77,4 +77,24 @@ userService.oAuthLogin = async ({ service, id, email, name, avatar }) => {
   });
 };
 
+userService.updateInfomation = async (data) => {
+  if (Object.keys(data).length !== 0) {
+    const user = await User.findOne({ where: { id: data.id } });
+    if (Object.keys(data).includes('point')) {
+      data = { ...data, point: parseInt(data.point) };
+    }
+    const updatedUser = { ...user, ...data };
+    user.update(updatedUser);
+    return user;
+  }
+  return null;
+};
+userService.getHistoryGame = async ({ id }) => {
+  return await Game.findAll({
+    attributes: ['playerFirst', 'playerSecond', 'userWin'],
+    where: {
+      [Op.or]: [{ playerFirst: id }, { playerSecond: id }],
+    },
+  });
+};
 export default userService;

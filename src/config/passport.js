@@ -21,6 +21,7 @@ const jwtVerify = async (payload, done) => {
     }
     done(null, user);
   } catch (error) {
+    console.log('🚀 ~ file: passport.js ~ line 25 ~ jwtVerify ~ error', error);
     done(error, false);
   }
 };
@@ -31,7 +32,6 @@ const oAuth = (service) => async (token, done) => {
     const user = await userService.oAuthLogin(userData);
     return done(null, user);
   } catch (err) {
-    console.log('err', err);
     return done(err);
   }
 };
