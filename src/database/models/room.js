@@ -23,7 +23,7 @@ module.exports = (sequelize, DataTypes) => {
         autoIncrement: false,
       },
       name: DataTypes.STRING,
-      createdBy: DataTypes.STRING,
+      createdBy: DataTypes.UUID,
     },
     {
       sequelize,

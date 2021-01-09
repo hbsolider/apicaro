@@ -1,5 +1,5 @@
-"use strict";
-const { Model } = require("sequelize");
+'use strict';
+const { Model } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
   class Game extends Model {
     /**
@@ -10,7 +10,15 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       // define association here
       this.hasMany(models.Step);
-      this.belongsTo(models.Room, { foreignKey: "roomId" });
+      this.belongsTo(models.Room, { foreignKey: 'roomId' });
+      this.belongsTo(models.User, {
+        as: 'infoPlayerFirst',
+        foreignKey: 'playerFirst',
+      });
+      this.belongsTo(models.User, {
+        as: 'infoPlayerSecond',
+        foreignKey: 'playerSecond',
+      });
     }
   }
   Game.init(
@@ -26,8 +34,8 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.UUID,
         allowNull: false,
         references: {
-          model: "Room",
-          key: "id",
+          model: 'Room',
+          key: 'id',
         },
       },
       playerFirst: {
@@ -44,7 +52,7 @@ module.exports = (sequelize, DataTypes) => {
     },
     {
       sequelize,
-      modelName: "Game",
+      modelName: 'Game',
     }
   );
   return Game;
