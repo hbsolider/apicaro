@@ -1,11 +1,13 @@
+import moment from 'moment';
 class User {
-  constructor({ id, name, email, point, avatar }) {
+  constructor({ id, name, email, point, avatar, createdAt }) {
     this.id = id;
     this.name = name;
     this.email = email;
     this.point = point;
     this.avatar = avatar;
-    this.status = 'WAITING';
+    this.createdAt = moment(createdAt).format('YYYY-MM-DD');
+    this.status = 'ONLINE';
     this.inRoom = '';
     this.sockets = [];
   }

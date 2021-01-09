@@ -4,8 +4,6 @@ const app = require('./config/express');
 import socketio from 'socket.io';
 import initSockets from 'sockets';
 
-app.enable('trust proxy');
-app.use('/api/user', require('./router/user.router'));
 app.use((error, req, res, next) => {
   res.status(error.status || 500);
   res.json({

@@ -21,7 +21,7 @@ module.exports = {
         type: Sequelize.STRING,
       },
       point: {
-        type: Sequelize.STRING,
+        type: Sequelize.INTEGER,
       },
       createdAt: {
         type: Sequelize.DATE,
@@ -32,6 +32,12 @@ module.exports = {
         defaultValue: Sequelize.NOW,
       },
       avatar: {
+        type: Sequelize.STRING,
+      },
+      google: {
+        type: Sequelize.STRING,
+      },
+      facebook: {
         type: Sequelize.STRING,
       },
       isAdmin: {

@@ -18,6 +18,11 @@ const getRoomList = (io) => {
         //     });
         //   });
         // }
+      if (user?.status !== 'PLAYING') {
+        if (user?.sockets.length === 1) {
+          const roomPanel = roomList.leaveRoom(user.inRoom, user);
+          io.to(user.inRoom).emit('server-send-leave-room', { roomPanel });
+        }
       }
     });
 
