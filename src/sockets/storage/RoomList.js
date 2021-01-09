@@ -37,6 +37,10 @@ class RoomList {
   leaveRoom(roomId, user) {
     return this.rooms[roomId]?.leave(user.id);
   }
+
+  getAllUserRoomId(roomId) {
+    return this.rooms[roomId]?.getAllUserInRoom(roomId);
+  }
 }
 
 export default RoomList;

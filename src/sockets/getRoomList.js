@@ -1,5 +1,6 @@
 import { onlineUserList, roomList } from './storage';
 import Room from './storage/Room';
+import { USER_STATUS } from 'utils/constants';
 
 const getRoomList = (io) => {
   io.on('connection', (socket) => {
@@ -7,8 +8,17 @@ const getRoomList = (io) => {
       const user = onlineUserList.getUserBySocketId(socket.id);
       if (user?.status !== 'PLAYING') {
         if (user?.inRoom) {
+          const usersInRoom = roomList.getAllUserRoomId(user?.inRoom);
+          if (usersInRoom.length === 1) {
+            roomList.remove(user?.inRoom);
+            io.sockets.emit('server-send-room-list', {
+              listRoom: roomList.transform(),
+            });
+          }
+
           const roomPanel = roomList.leaveRoom(user.inRoom, user);
           user.leaveRoom();
+          user.updateStatus(USER_STATUS.ONLINE);
           socket.leave(user.inRoom);
           io.to(user.inRoom).emit('server-send-leave-room', { roomPanel });
           const userConnects = user.sockets;
@@ -22,9 +32,17 @@ const getRoomList = (io) => {
     });
 
     socket.on('client-leave-room', ({ room }) => {
+      const usersInRoom = roomList.getAllUserRoomId(room.id);
+      if (usersInRoom.length === 1) {
+        roomList.remove(room.id);
+        io.sockets.emit('server-send-room-list', {
+          listRoom: roomList.transform(),
+        });
+      }
       const user = onlineUserList.getUserBySocketId(socket.id);
       const roomPanel = roomList.leaveRoom(room.id, user);
       user.leaveRoom();
+      user.updateStatus(USER_STATUS.ONLINE);
       socket.leave(room.id);
       io.to(room.id).emit('server-send-leave-room', { roomPanel });
       const userConnects = user.sockets;
@@ -46,6 +64,8 @@ const getRoomList = (io) => {
           room.timePerStep
         );
         roomList.add(roomCreated);
+
+        user.updateStatus(USER_STATUS.IN_ROOM);
         socket.join(room.id);
         socket.emit('server-send-create-room', {
           roomId: room.id,
@@ -158,6 +178,8 @@ const getRoomList = (io) => {
       const roomPanel = roomList.getById(roomId);
       if (isJoinRoomSuccess) {
         roomList.updateViewingList(roomId, user);
+
+        user.updateStatus(USER_STATUS.IN_ROOM);
         socket.join(roomId);
         io.to(roomId).emit('server-send-join-user', { roomPanel });
       } else
@@ -165,6 +187,21 @@ const getRoomList = (io) => {
           inRoom: user.inRoom,
           password: roomPanel.password,
         });
+    });
+
+    socket.on('client-invite-join-room', ({ userInvited }) => {
+      const user = onlineUserList.getUserBySocketId(socket.id);
+      const connectsUserInvited = userInvited.sockets;
+      const roomPanel = roomList.getById(user.inRoom);
+
+      connectsUserInvited.forEach((connect) => {
+        socket.to(connect).emit('server-send-invite-join-room', {
+          user,
+          inRoom: user.inRoom,
+          joinId: roomPanel.joinId,
+          password: roomPanel.password,
+        });
+      });
     });
   });
 };

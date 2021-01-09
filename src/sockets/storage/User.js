@@ -24,6 +24,9 @@ class User {
   leaveRoom() {
     this.inRoom = '';
   }
+  updateStatus(status) {
+    this.status = status;
+  }
 }
 
 export default User;
