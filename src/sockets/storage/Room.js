@@ -67,6 +67,50 @@ class Room {
     users.push(...this.viewingList);
     return users;
   }
+
+  isInBoard(user) {
+    if (this.firstPlayer?.id === user.id || this.secondPlayer?.id === user.id) {
+      return true;
+    }
+    return false;
+  }
+
+  isBoardFull() {
+    return this.firstPlayer && this.secondPlayer;
+  }
+
+  joinBoard(user) {
+    if (!this.firstPlayer) {
+      this.firstPlayer = user;
+      this.viewingList = this.viewingList.filter((item) => item.id !== user.id);
+      return this;
+    }
+    if (!this.secondPlayer) {
+      this.secondPlayer = user;
+      this.viewingList = this.viewingList.filter((item) => item.id !== user.id);
+      return this;
+    }
+    return this;
+  }
+
+  outBoard(user) {
+    if (this.firstPlayer?.id === user.id) {
+      this.firstPlayer = null;
+      this.viewingList.push(user);
+      return this;
+    }
+    if (this.secondPlayer?.id === user.id) {
+      this.secondPlayer = null;
+      this.viewingList.push(user);
+      return this;
+    }
+    return this;
+  }
+
+  joinOutBoard(user) {
+    if (this.isInBoard(user)) return this.outBoard(user);
+    return this.joinBoard(user);
+  }
 }
 
 export default Room;
