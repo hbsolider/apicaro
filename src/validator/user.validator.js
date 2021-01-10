@@ -7,3 +7,16 @@ export const validateInfomation = Joi.object({
   id: Joi.allow(),
   isBlocked: Joi.allow(),
 });
+
+export const validateVerify = {
+  body: Joi.object({
+    user: Joi.object().required(),
+    tokens: Joi.object().required(),
+  }),
+};
+
+export const validateDecodeKey = {
+  query: Joi.object({
+    decodekey: Joi.string().required(),
+  }),
+};

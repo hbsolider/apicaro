@@ -1,4 +1,4 @@
-import { Game, User } from 'database/models';
+import { Game, User, Room } from 'database/models';
 const { Op } = require('sequelize');
 
 const gameService = {};
@@ -14,8 +14,11 @@ gameService.getAll = async () => {
         model: User,
         as: 'infoPlayerSecond',
       },
+      {
+        model: Room,
+      },
     ],
-    attributes: ['id', 'playerFirst', 'playerSecond', 'userWin'],
+    attributes: ['id', 'playerFirst', 'playerSecond', 'userWin', 'updatedAt'],
     // offset: (page - 1) * 11,
     // limit: limit,
     order: [['id', 'DESC']],
