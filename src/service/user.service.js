@@ -77,7 +77,7 @@ userService.oAuthLogin = async ({ service, id, email, name, avatar }) => {
   });
 };
 
-userService.updateInfomation = async (data) => {
+userService.updateInformation = async (data) => {
   if (Object.keys(data).length !== 0) {
     const user = await User.findOne({ where: { id: data.id } });
     if (Object.keys(data).includes('point')) {
@@ -106,6 +106,7 @@ userService.checkActived = async ({ id }) => {
   });
   return !!check?.dataValues?.isActivated;
 };
+
 userService.verify = async ({ id, email }) => {
   const user = await User.findOne({
     where: {
@@ -118,5 +119,12 @@ userService.verify = async ({ id, email }) => {
     return await user.save();
   }
   return null;
+};
+
+userService.getListUserOrderByRank = async () => {
+  return await User.findAll({
+    limit: 10,
+    order: [['point', 'DESC']],
+  });
 };
 export default userService;
