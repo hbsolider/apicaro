@@ -27,6 +27,14 @@ class User {
   updateStatus(status) {
     this.status = status;
   }
+
+  toggleReady() {
+    if (this.status === 'READY') this.updateStatus('IN_ROOM');
+    else {
+      if (this.status === 'IN_ROOM') this.updateStatus('READY');
+    }
+    return this;
+  }
 }
 
 export default User;

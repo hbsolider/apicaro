@@ -26,6 +26,7 @@ class Room {
   }
 
   leave(userId) {
+    this.updateStatus('WAITING');
     if (this.firstPlayer?.id === userId) {
       this.firstPlayer = null;
       return this;
@@ -108,8 +109,21 @@ class Room {
   }
 
   joinOutBoard(user) {
+    user.updateStatus('IN_ROOM');
     if (this.isInBoard(user)) return this.outBoard(user);
     return this.joinBoard(user);
+  }
+
+  isAllReady() {
+    return (
+      this.firstPlayer?.status === 'READY' &&
+      this.secondPlayer?.status === 'READY'
+    );
+  }
+
+  updateStatus(status) {
+    this.status = status;
+    return this;
   }
 }
 

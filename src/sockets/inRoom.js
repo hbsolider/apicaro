@@ -10,6 +10,14 @@ const getRoomList = (io) => {
       roomPanel = roomPanel.joinOutBoard(user);
       io.to(user.inRoom).emit('server-panel-room-info', { roomPanel });
     });
+
+    socket.on('client-user-toggle-ready', () => {
+      const user = onlineUserList.getUserBySocketId(socket.id);
+      let roomPanel = roomList.getById(user.inRoom);
+      user.toggleReady();
+      if (roomPanel.isAllReady()) roomPanel.updateStatus('PLAYING');
+      io.to(user.inRoom).emit('server-panel-room-info', { roomPanel });
+    });
   });
 };
 

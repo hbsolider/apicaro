@@ -89,7 +89,7 @@ const getRoomList = (io) => {
       const roomPanel = roomList.getById(roomId);
       const isInAnotherRoom = user.isInAnotherRoom(roomId);
       if (!isInAnotherRoom) {
-        if (roomPanel.password === password) {
+        if (roomPanel?.password === password) {
           socket.emit('server-check-pass-room', {
             isInAnotherRoom,
             isCorrect: true,
@@ -147,7 +147,7 @@ const getRoomList = (io) => {
       const roomPanel = roomList.getById(roomId);
       const isInAnotherRoom = user.isInAnotherRoom(roomId);
       if (!isInAnotherRoom) {
-        if (roomPanel.password === password) {
+        if (roomPanel?.password === password) {
           socket.emit('server-check-pass-room-home', {
             isInAnotherRoom,
             isCorrect: true,
