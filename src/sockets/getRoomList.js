@@ -6,22 +6,21 @@ const getRoomList = (io) => {
   io.on('connection', (socket) => {
     socket.on('disconnect', () => {
       const user = onlineUserList.getUserBySocketId(socket.id);
-      if (user?.status !== 'PLAYING') {
+      if (user && user?.status !== 'PLAYING') {
         if (user?.inRoom) {
+          const userConnects = user.sockets;
           const usersInRoom = roomList.getAllUserRoomId(user?.inRoom);
+          const roomPanel = roomList.leaveRoom(user.inRoom, user);
+          io.to(user.inRoom).emit('server-send-leave-room', { roomPanel });
+          socket.leave(user.inRoom);
           if (usersInRoom.length === 1) {
             roomList.remove(user?.inRoom);
             io.sockets.emit('server-send-room-list', {
               listRoom: roomList.transform(),
             });
           }
-
-          const roomPanel = roomList.leaveRoom(user.inRoom, user);
-          user.leaveRoom();
           user.updateStatus(USER_STATUS.ONLINE);
-          socket.leave(user.inRoom);
-          io.to(user.inRoom).emit('server-send-leave-room', { roomPanel });
-          const userConnects = user.sockets;
+          user.leaveRoom();
           userConnects.forEach((connect) => {
             io.to(connect).emit('server-send-leaved-room', {
               isLeaveRoom: true,
@@ -90,6 +89,7 @@ const getRoomList = (io) => {
       const isInAnotherRoom = user.isInAnotherRoom(roomId);
       if (!isInAnotherRoom) {
         if (roomPanel?.password === password) {
+          user.updateStatus(USER_STATUS.IN_ROOM);
           socket.emit('server-check-pass-room', {
             isInAnotherRoom,
             isCorrect: true,
@@ -178,15 +178,14 @@ const getRoomList = (io) => {
       const roomPanel = roomList.getById(roomId);
       if (isJoinRoomSuccess) {
         roomList.updateViewingList(roomId, user);
-
-        user.updateStatus(USER_STATUS.IN_ROOM);
         socket.join(roomId);
         io.to(roomId).emit('server-send-join-user', { roomPanel });
-      } else
+      } else {
         socket.emit('server-send-in-room', {
           inRoom: user.inRoom,
           password: roomPanel.password,
         });
+      }
     });
 
     socket.on('client-invite-join-room', ({ userInvited }) => {

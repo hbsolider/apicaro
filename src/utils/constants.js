@@ -12,4 +12,5 @@ export const USER_STATUS = {
   PLAYING: 'PLAYING',
   IN_ROOM: 'IN_ROOM',
   SEARCHING: 'SEARCHING',
+  READY: 'READY',
 };

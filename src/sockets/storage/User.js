@@ -12,7 +12,7 @@ class User {
     this.sockets = [];
   }
   joinRoom(roomId) {
-    if (!this.inRoom || this.inRoom === roomId) {
+    if (this.inRoom === '' || this.inRoom === roomId) {
       this.inRoom = roomId;
       return true;
     }

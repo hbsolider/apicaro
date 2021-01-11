@@ -11,7 +11,7 @@ export default {
       const { id, name, email, picture } = response.data;
       return {
         service: 'facebook',
-        picture: picture.data.url,
+        avatar: picture.data.url,
         id,
         name,
         email,

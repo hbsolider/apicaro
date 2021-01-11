@@ -39,7 +39,7 @@ class RoomList {
   }
 
   getAllUserRoomId(roomId) {
-    return this.rooms[roomId]?.getAllUserInRoom(roomId);
+    return this.rooms[roomId]?.getAllUserInRoom(roomId) ?? [];
   }
 }
 

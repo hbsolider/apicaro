@@ -1,6 +1,4 @@
 import { onlineUserList, roomList } from './storage';
-import Room from './storage/Room';
-import { USER_STATUS } from 'utils/constants';
 
 const getRoomList = (io) => {
   io.on('connection', (socket) => {
