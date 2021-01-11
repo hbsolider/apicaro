@@ -35,7 +35,7 @@ class RoomList {
     return this.rooms[roomId]?.updateViewingList(user);
   }
   leaveRoom(roomId, user) {
-    return this.rooms[roomId]?.leave(user.id);
+    return this.rooms[roomId]?.leave(user);
   }
 
   getAllUserRoomId(roomId) {

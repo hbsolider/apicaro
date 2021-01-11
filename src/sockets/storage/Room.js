@@ -12,26 +12,17 @@ class Room {
     this.viewingList = [];
   }
 
-  join(user) {
-    if (!this.firstPlayer) {
-      this.firstPlayer = user;
-      return this;
-    }
-    if (!this.secondPlayer) {
-      this.secondPlayer = user;
-      return this;
-    }
-    this.viewingList.push(user);
-    return this;
-  }
-
-  leave(userId) {
-    this.updateStatus('WAITING');
+  leave(user) {
+    const userId = user?.id;
     if (this.firstPlayer?.id === userId) {
+      this.updateStatus('WAITING');
+      if (user?.status === 'PLAYING') this.resetStatusUsersInBoard();
       this.firstPlayer = null;
       return this;
     }
     if (this.secondPlayer?.id === userId) {
+      this.updateStatus('WAITING');
+      if (user?.status === 'PLAYING') this.resetStatusUsersInBoard();
       this.secondPlayer = null;
       return this;
     }
@@ -128,11 +119,16 @@ class Room {
 
   startToPlay() {
     if (this.isAllReady()) {
-      this.updateStatus('PLAYING');
+      this.updateStatus('START');
       this.firstPlayer?.updateStatus('PLAYING');
       this.secondPlayer?.updateStatus('PLAYING');
       return this;
     }
+  }
+
+  resetStatusUsersInBoard() {
+    this.firstPlayer?.updateStatus('IN_ROOM');
+    this.secondPlayer?.updateStatus('IN_ROOM');
   }
 }
 
