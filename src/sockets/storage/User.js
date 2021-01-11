@@ -1,4 +1,5 @@
 import moment from 'moment';
+import { USER_RANK } from 'utils/constants';
 class User {
   constructor({ id, name, email, point, avatar, createdAt }) {
     this.id = id;
@@ -34,6 +35,26 @@ class User {
       if (this.status === 'IN_ROOM') this.updateStatus('READY');
     }
     return this;
+  }
+  getRankUser() {
+    const point = this.point;
+    let rank = USER_RANK.BRONZE;
+    if (100 <= point && point < 200) {
+      rank = USER_RANK.SILVER;
+    }
+    if (200 <= point && point < 300) {
+      rank = USER_RANK.GOLD;
+    }
+    if (300 <= point && point < 400) {
+      rank = USER_RANK.PLATINUM;
+    }
+    if (400 <= point && point < 500) {
+      rank = USER_RANK.DIAMOND;
+    }
+    if (point > 500) {
+      rank = USER_RANK.MASTER;
+    }
+    return rank;
   }
 }
 

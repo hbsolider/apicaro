@@ -5,8 +5,10 @@ import getRoomList from './getRoomList';
 import getRankList from './getRankList';
 import inRoom from './inRoom';
 import game from './game';
+import matchingGame from './matchingGame';
 
 const initSockets = (io) => {
+  matchingGame(io);
   getRoomList(io);
   getOnlineList(io);
   // chatWorld(io);

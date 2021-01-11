@@ -14,3 +14,12 @@ export const USER_STATUS = {
   SEARCHING: 'SEARCHING',
   READY: 'READY',
 };
+
+export const USER_RANK = {
+  BRONZE: 'BRONZE',
+  SILVER: 'SILVER',
+  GOLD: 'GOLD',
+  PLATINUM: 'PLATINUM',
+  DIAMOND: 'DIAMOND',
+  MASTER: 'MASTER',
+};

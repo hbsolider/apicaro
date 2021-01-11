@@ -1,11 +1,11 @@
 class Room {
-  constructor(id, joinId, name, user, password, timePerStep) {
+  constructor(id, joinId, name, user, password, timePerStep, secondPlayer) {
     this.id = id;
     this.joinId = joinId;
     this.name = name;
     this.createdBy = user.id;
     this.firstPlayer = user;
-    this.secondPlayer = null;
+    this.secondPlayer = secondPlayer || null;
     this.password = password ?? '';
     this.status = 'WAITING';
     this.timePerStep = timePerStep || 30;
