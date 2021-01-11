@@ -9,6 +9,18 @@ authService.loginUserWithEmailAndPassword = async (email, password) => {
   if (!user || !(await user.isPasswordMatch(password))) {
     throw new ApiError(httpStatus.UNAUTHORIZED, 'Incorrect email or password');
   }
+  if (!user.isActivated) {
+    throw new ApiError(
+      httpStatus.UNAUTHORIZED,
+      'Please verify your email to active account'
+    );
+  }
+  if (user.isBlocked) {
+    throw new ApiError(
+      httpStatus.UNAUTHORIZED,
+      'Hi your account is block, contact to admin to unblock'
+    );
+  }
   return user;
 };
 

@@ -1,4 +1,4 @@
-import { User } from 'database/models';
+import { User, Game } from 'database/models';
 import httpStatus from 'http-status';
 import ApiError from 'utils/ApiError';
 import { ROLES } from 'utils/constants';
@@ -97,6 +97,28 @@ userService.getHistoryGame = async ({ id }) => {
       [Op.or]: [{ playerFirst: id }, { playerSecond: id }],
     },
   });
+};
+
+userService.checkActived = async ({ id }) => {
+  const check = await User.findOne({
+    where: { id },
+    attributes: ['isActivated'],
+  });
+  return !!check?.dataValues?.isActivated;
+};
+
+userService.verify = async ({ id, email }) => {
+  const user = await User.findOne({
+    where: {
+      id,
+      email,
+    },
+  });
+  if (!!user) {
+    user.isActivated = true;
+    return await user.save();
+  }
+  return null;
 };
 
 userService.getListUserOrderByRank = async () => {
