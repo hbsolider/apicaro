@@ -3,7 +3,11 @@ const jwt = require('jsonwebtoken');
 const BadRequest = require('../utils/badRequest');
 import { validateInfomation } from 'validator/user.validator';
 import userService from 'service/user.service';
-import { sendMailActiveAccount } from 'config/nodemailer';
+import {
+  sendMailActiveAccount,
+  sendMailResetPassword,
+} from 'config/nodemailer';
+import { reset } from 'nodemon';
 
 module.exports = {
   async getAllUser(req, res) {
@@ -76,12 +80,45 @@ module.exports = {
         );
         const mail = await sendMailActiveAccount({
           receiverEmail: email,
-          link: `${process.env.clientUrl}${secret}`,
+          link: `${process.env.clientUrl}verify?decodekey=${secret}`,
         });
         return res.send(mail);
       } else {
         return res.send({ message: 'Account is actived' });
       }
     }
+  },
+
+  async forgotPassword(req, res) {
+    const { email } = req.body;
+    const user = await userService.getUserByEmail(email);
+    if (!!user) {
+      const secret = await jwt.sign(
+        { email, id: user.id },
+        process.env.JWT_SECRET,
+        {
+          expiresIn: 900000,
+        }
+      );
+      const mail = await sendMailResetPassword({
+        receiverEmail: email,
+        link: `${process.env.clientUrl}forgotpassword?secretKey=${secret}`,
+      });
+      return res.send(mail);
+    } else {
+      throw new BadRequest('Email is not exist!');
+    }
+  },
+
+  async resetPassword(req, res) {
+    const { secretKey, password } = req.body;
+    const decode = await jwt.verify(secretKey, process.env.JWT_SECRET);
+    const { email, id } = decode;
+    const user = await userService.changePassword({
+      email,
+      password,
+      id,
+    });
+    return res.send(user);
   },
 };

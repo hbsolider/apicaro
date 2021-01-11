@@ -89,7 +89,12 @@ const getRoomList = (io) => {
       const isInAnotherRoom = user.isInAnotherRoom(roomId);
       if (!isInAnotherRoom) {
         if (roomPanel?.password === password) {
-          user.updateStatus(USER_STATUS.IN_ROOM);
+          if (user.id === roomPanel.firstPlayer?.id) {
+            user.clone(roomPanel.firstPlayer);
+          } else if (user.id === roomPanel.secondPlayer?.id)
+            user.clone(roomPanel.secondPlayer);
+          else user.updateStatus(USER_STATUS.IN_ROOM);
+
           user.joinRoom(roomId);
           roomList.updateViewingList(roomId, user);
           socket.emit('server-check-pass-room-and-join', {
@@ -116,6 +121,8 @@ const getRoomList = (io) => {
           passRoomUserIn: roomUserIn.password,
         });
       }
+      const userList = onlineUserList.transform();
+      io.sockets.emit('server-send-user-list', { userList });
     });
 
     socket.on('client-get-rooms', () => {

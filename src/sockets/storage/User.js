@@ -12,6 +12,30 @@ class User {
     this.inRoom = '';
     this.sockets = [];
   }
+
+  clone({
+    id,
+    name,
+    email,
+    point,
+    avatar,
+    createdAt,
+    status,
+    inRoom,
+    sockets,
+  }) {
+    this.id = id;
+    this.name = name;
+    this.email = email;
+    this.point = point;
+    this.avatar = avatar;
+    this.createdAt = createdAt;
+    this.status = status;
+    this.inRoom = inRoom;
+    this.sockets = [...sockets];
+    return this;
+  }
+
   joinRoom(roomId) {
     if (this.inRoom === '' || this.inRoom === roomId) {
       this.inRoom = roomId;

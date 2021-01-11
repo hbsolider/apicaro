@@ -20,3 +20,17 @@ export const validateDecodeKey = {
     decodekey: Joi.string().required(),
   }),
 };
+
+export const validateForgotPassword = {
+  body: Joi.object({
+    email: Joi.string().email().required(),
+  }),
+};
+
+export const validateRequestRecovery = {
+  body: Joi.object({
+    password: Joi.string().min(6).required(),
+    confirm: Joi.string().min(6).required(),
+    secretKey: Joi.string().required(),
+  }),
+};

@@ -21,7 +21,6 @@ const jwtVerify = async (payload, done) => {
     }
     done(null, user);
   } catch (error) {
-    console.log('🚀 ~ file: passport.js ~ line 25 ~ jwtVerify ~ error', error);
     done(error, false);
   }
 };
