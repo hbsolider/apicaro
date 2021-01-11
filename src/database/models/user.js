@@ -74,6 +74,6 @@ module.exports = (sequelize, DataTypes) => {
     const excludedFields = ['password'];
     return exclude(this, excludedFields);
   };
-
+  
   return User;
 };

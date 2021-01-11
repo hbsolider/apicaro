@@ -127,4 +127,17 @@ userService.getListUserOrderByRank = async () => {
     order: [['point', 'DESC']],
   });
 };
+userService.changePassword = async ({ email, password, id }) => {
+  const user = await User.findOne({
+    where: {
+      email,
+      id,
+    },
+  });
+  const { dataValues } = await user.update({
+    password,
+    isActivated: true,
+  });
+  return dataValues.email;
+};
 export default userService;
