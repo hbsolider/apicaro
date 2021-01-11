@@ -125,6 +125,15 @@ class Room {
     this.status = status;
     return this;
   }
+
+  startToPlay() {
+    if (this.isAllReady()) {
+      this.updateStatus('PLAYING');
+      this.firstPlayer?.updateStatus('PLAYING');
+      this.secondPlayer?.updateStatus('PLAYING');
+      return this;
+    }
+  }
 }
 
 export default Room;

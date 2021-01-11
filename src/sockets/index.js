@@ -4,7 +4,7 @@ import chatRoom from './chatRoom';
 import getRoomList from './getRoomList';
 import getRankList from './getRankList';
 import inRoom from './inRoom';
-import game from './game';
+import inGame from './inGame';
 
 const initSockets = (io) => {
   getRoomList(io);
@@ -13,6 +13,7 @@ const initSockets = (io) => {
   chatRoom(io);
   getRankList(io);
   inRoom(io);
+  inGame(io);
   // game(io);
 };
 
