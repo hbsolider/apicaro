@@ -18,6 +18,20 @@ class Game {
     else this.turn = 0;
     return this;
   }
+
+  requestDraw(user) {
+    if (user.id === this.firstPlayer.id) {
+    }
+    if (user.id === this.firstPlayer.id) {
+    }
+  }
+
+  getRival(user) {
+    if (user.id === this.firstPlayer.id) {
+      return this.secondPlayer;
+    }
+    return this.firstPlayer;
+  }
 }
 
 export default Game;

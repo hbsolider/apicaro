@@ -7,9 +7,12 @@ const inGame = (io) => {
       const user = onlineUserList.getUserBySocketId(socket.id);
       const roomPanel = roomList.getById(user.inRoom);
       roomPanel.updateStatus('PLAYING');
-      const gameInfo = gameList.add(roomPanel);
-      io.to(user.inRoom).emit('server-panel-room-info', { roomPanel });
-      io.to(user.inRoom).emit('server-game-info', { gameInfo });
+      const isAddGameSuccess = gameList.add(roomPanel);
+      const gameInfo = gameList.getByRoomId(roomPanel.id);
+      if (isAddGameSuccess) {
+        io.to(user.inRoom).emit('server-panel-room-info', { roomPanel });
+        io.to(user.inRoom).emit('server-game-info', { gameInfo });
+      }
     });
 
     socket.on('client-update-game-info', ({ gameId, type }) => {
@@ -21,6 +24,36 @@ const inGame = (io) => {
       //     gameInfo.switchTurn();
       // }
       // io.to(user.inRoom).emit('server-game-info', { gameInfo });
+    });
+
+    socket.on('client-request-draw', ({ gameId }) => {
+      const user = onlineUserList.getUserBySocketId(socket.id);
+      const gameInfo = gameList.getById(gameId);
+      const rival = gameInfo.getRival(user);
+      rival.sockets?.forEach((socketId) =>
+        io
+          .to(socketId)
+          .emit('server-confirm-request-draw', { requestedUser: user })
+      );
+    });
+
+    socket.on('client-refuse-request-draw', ({ gameId }) => {
+      const user = onlineUserList.getUserBySocketId(socket.id);
+      const gameInfo = gameList.getById(gameId);
+      const rival = gameInfo.getRival(user);
+      rival.sockets?.forEach((socketId) =>
+        io
+          .to(socketId)
+          .emit('server-confirm-refuse-request-draw', { answerUser: user })
+      );
+    });
+
+    socket.on('client-accept-request-draw', ({ gameId }) => {
+      // TODO: Xử lý hòa
+    });
+
+    socket.on('client-surrender', ({ gameId }) => {
+      // TODO: Xử lý thua
     });
   });
 };
