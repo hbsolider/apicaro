@@ -1,9 +1,5 @@
 class MatchingListUser {
   constructor() {
-    if (MatchingListUser.instance) {
-      return MatchingListUser.instance;
-    }
-    MatchingListUser.instance = this;
     this.users = [];
     this.size = 0;
   }
