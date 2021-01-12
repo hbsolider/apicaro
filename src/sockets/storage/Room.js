@@ -8,8 +8,9 @@ class Room {
     this.secondPlayer = secondPlayer || null;
     this.password = password ?? '';
     this.status = 'WAITING';
-    this.timePerStep = timePerStep || 30;
+    this.timePerStep = +timePerStep || 30;
     this.viewingList = [];
+    this.firstStep = 0;
   }
 
   leave(user) {
