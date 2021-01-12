@@ -56,4 +56,15 @@ gameService.listGamesByUser = async (id) => {
   return games;
 };
 
+gameService.createOne = async (data) => {
+  const { id, roomId, firstPlayer, secondPlayer } = data;
+  const newRoom = await Room.create({
+    id,
+    roomId,
+    playerFirst: firstPlayer,
+    playerSecond: secondPlayer,
+  });
+  return newRoom;
+};
+
 export default gameService;
