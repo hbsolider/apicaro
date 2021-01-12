@@ -1,4 +1,4 @@
-import { Game, User, Room } from 'database/models';
+import { Game, User, Room, Step, Message } from 'database/models';
 const { Op } = require('sequelize');
 
 const gameService = {};
@@ -9,24 +9,95 @@ gameService.getAll = async () => {
       {
         model: User,
         as: 'infoPlayerFirst',
+        required: false,
       },
       {
         model: User,
         as: 'infoPlayerSecond',
+        required: false,
       },
       {
         model: Room,
+        as: 'room',
+        required: false,
       },
     ],
     attributes: ['id', 'playerFirst', 'playerSecond', 'userWin', 'updatedAt'],
     // offset: (page - 1) * 11,
     // limit: limit,
-    order: [['id', 'DESC']],
+    order: [['updatedAt', 'DESC']],
   });
   if (list) {
     return list;
   }
   return null;
+};
+
+gameService.getOneById = async (id) => {
+  const { createdAt, completeAt } = await Game.findOne({
+    where: {
+      id,
+    },
+  });
+
+  const game = await Game.findOne({
+    include: [
+      {
+        model: User,
+        as: 'infoPlayerFirst',
+        required: false,
+      },
+      {
+        model: User,
+        as: 'infoPlayerSecond',
+        required: false,
+      },
+      {
+        model: Room,
+        as: 'room',
+        required: false,
+        include: [
+          {
+            model: Message,
+            as: 'message',
+            required: false,
+            include: [
+              {
+                model: User,
+                required: false,
+                attributes: ['name'],
+              },
+            ],
+            where: {
+              createdAt: {
+                [Op.between]: [createdAt, completeAt],
+              },
+            },
+            order: [['createdAt', 'DESC']],
+          },
+        ],
+      },
+      {
+        model: Step,
+        as: 'step',
+        required: false,
+        attributes: ['board'],
+      },
+    ],
+    where: {
+      id,
+    },
+  });
+  return game;
+};
+
+gameService.getManyAndCountByUser = async (userId) => {
+  const games = await Game.findAndCountAll({
+    where: {
+      userId,
+    },
+  });
+  return games;
 };
 
 gameService.listGamesByUser = async (id) => {
@@ -45,6 +116,11 @@ gameService.listGamesByUser = async (id) => {
       {
         model: Room,
         as: 'room',
+        required: false,
+      },
+      {
+        model: Step,
+        as: 'step',
         required: false,
       },
     ],

@@ -98,6 +98,20 @@ class Game {
     }
     return this.timeLeft;
   }
+
+  requestDraw(user) {
+    if (user.id === this.firstPlayer.id) {
+    }
+    if (user.id === this.firstPlayer.id) {
+    }
+  }
+
+  getRival(user) {
+    if (user.id === this.firstPlayer.id) {
+      return this.secondPlayer;
+    }
+    return this.firstPlayer;
+  }
 }
 
 export default Game;

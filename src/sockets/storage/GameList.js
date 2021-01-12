@@ -25,12 +25,12 @@ class GameList {
 
   add(roomPanel) {
     const existedGame = this.getByRoomId(roomPanel.id);
-    if (existedGame) return existedGame;
+    if (existedGame) return false;
 
     const newGame = new Game(roomPanel);
     this.games[newGame.id] = newGame;
     gameService.createOne(newGame);
-    return newGame;
+    return true;
   }
 
   remove(gameId) {

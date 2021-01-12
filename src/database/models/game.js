@@ -18,6 +18,7 @@ module.exports = (sequelize, DataTypes) => {
         as: 'infoPlayerSecond',
         foreignKey: 'playerSecond',
       });
+      this.hasMany(models.Step, { as: 'step', foreignKey: 'gameId' });
     }
   }
   Game.init(
@@ -47,6 +48,9 @@ module.exports = (sequelize, DataTypes) => {
       },
       userWin: {
         type: DataTypes.UUID,
+      },
+      completeAt: {
+        type: DataTypes.DATE,
       },
     },
     {
