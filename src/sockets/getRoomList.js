@@ -89,9 +89,15 @@ const getRoomList = (io) => {
       const isInAnotherRoom = user.isInAnotherRoom(roomId);
       if (!isInAnotherRoom) {
         if (roomPanel?.password === password) {
-          if (user.id === roomPanel.firstPlayer?.id) {
+          if (
+            user.id === roomPanel.firstPlayer?.id &&
+            roomPanel.firstPlayer?.status === USER_STATUS.PLAYING
+          ) {
             user.clone(roomPanel.firstPlayer);
-          } else if (user.id === roomPanel.secondPlayer?.id)
+          } else if (
+            user.id === roomPanel.secondPlayer?.id &&
+            roomPanel.firstPlayer?.status === USER_STATUS.PLAYING
+          )
             user.clone(roomPanel.secondPlayer);
           else user.updateStatus(USER_STATUS.IN_ROOM);
 
