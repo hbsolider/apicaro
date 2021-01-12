@@ -14,7 +14,7 @@ const user = [...Array(50)].map(() => ({
     'https://www.alliancerehabmed.com/wp-content/uploads/icon-avatar-default.png',
   isAdmin: false,
   isActivated: true,
-  isBlocked: true,
+  isBlocked: false,
   point: faker.random.number(),
   createdAt: new Date(),
   updatedAt: new Date(),

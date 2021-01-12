@@ -9,19 +9,23 @@ gameService.getAll = async () => {
       {
         model: User,
         as: 'infoPlayerFirst',
+        required: false,
       },
       {
         model: User,
         as: 'infoPlayerSecond',
+        required: false,
       },
       {
         model: Room,
+        as: 'room',
+        required: false,
       },
     ],
     attributes: ['id', 'playerFirst', 'playerSecond', 'userWin', 'updatedAt'],
     // offset: (page - 1) * 11,
     // limit: limit,
-    order: [['id', 'DESC']],
+    order: [['updatedAt', 'DESC']],
   });
   if (list) {
     return list;
@@ -85,6 +89,15 @@ gameService.getOneById = async (id) => {
     },
   });
   return game;
+};
+
+gameService.getManyAndCountByUser = async (userId) => {
+  const games = await Game.findAndCountAll({
+    where: {
+      userId,
+    },
+  });
+  return games;
 };
 
 gameService.listGamesByUser = async (id) => {
