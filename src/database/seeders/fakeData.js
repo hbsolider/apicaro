@@ -15,7 +15,10 @@ const user = [...Array(50)].map(() => ({
   isAdmin: false,
   isActivated: true,
   isBlocked: false,
-  point: faker.random.number(),
+  point: faker.random.number({
+    min: 0,
+    max: 600,
+  }),
   createdAt: new Date(),
   updatedAt: new Date(),
 }));

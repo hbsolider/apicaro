@@ -13,7 +13,7 @@ services:
       JWT_SECRET: anhem1nha
       JWT_EXPIRATION_MINUTES: 30
       JWT_REFRESH_EXPIRATION_DAYS: 30
-    command: sh -c "./wait-for-it.sh database:5432 && npm run migrate && npm start"
+    command: sh -c "./wait-for-it.sh database:5432 && npm run migrate && npm run migrate:seed && npm start"
     ports:
       - 6969:6969
 
