@@ -14,6 +14,7 @@ const getRoomList = (io) => {
       let roomPanel = roomList.getById(user.inRoom);
       user.toggleReady();
       roomPanel.startToPlay();
+      console.log({ roomPanel });
       io.to(user.inRoom).emit('server-panel-room-info', { roomPanel });
       io.sockets.emit('server-send-user-list', {
         userList: onlineUserList.transform(),

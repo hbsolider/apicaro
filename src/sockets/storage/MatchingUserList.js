@@ -9,9 +9,11 @@ class MatchingListUser {
   }
 
   enqueue(user) {
-    this.size += 1;
-    this.users.push(user);
-    return true;
+    if (user.id !== this.front()?.id) {
+      this.size += 1;
+      this.users.push(user);
+      return true;
+    }
   }
 
   dequeue() {
