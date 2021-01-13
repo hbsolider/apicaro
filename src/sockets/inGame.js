@@ -55,7 +55,9 @@ const inGame = (io) => {
             turn,
           });
         } else {
-          io.to(roomId).emit('server-game-info', { board: boardData, turn });
+          io.to(roomId).emit('server-game-info', {
+            gameInfo: { board: boardData, turn },
+          });
         }
       }
     });
@@ -67,6 +69,7 @@ const inGame = (io) => {
       io.to(roomId).emit('reset-game', board);
     });
     socket.on('client-request-draw', ({ gameId }) => {
+      console.log('gameId', gameId);
       const user = onlineUserList.getUserBySocketId(socket.id);
       const gameInfo = gameList.getById(gameId);
       const rival = gameInfo.getRival(user);
