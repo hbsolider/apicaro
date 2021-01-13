@@ -1,4 +1,4 @@
-import { onlineUserList, roomList } from './storage';
+import { onlineUserList, roomList, gameList } from './storage';
 import Room from './storage/Room';
 import { USER_STATUS } from 'utils/constants';
 
@@ -32,18 +32,41 @@ const getRoomList = (io) => {
 
     socket.on('client-leave-room', ({ room }) => {
       const usersInRoom = roomList.getAllUserRoomId(room.id);
+      const user = onlineUserList.getUserBySocketId(socket.id);
+      if (user?.status === USER_STATUS.PLAYING) {
+        const gameInfo = gameList.getByRoomId(room.id);
+        if (gameInfo) {
+          const losePlayer = onlineUserList.getUserBySocketId(socket.id);
+          if (losePlayer) {
+            const game = gameInfo.updateLoser(losePlayer.id);
+            if (game) {
+              const first = onlineUserList.getUserById(game.firstPlayer.id);
+              const second = onlineUserList.getUserById(game.secondPlayer.id);
+              first.updateStatus(USER_STATUS.IN_ROOM);
+              second.updateStatus(USER_STATUS.IN_ROOM);
+              gameList.remove(game.id);
+              io.to(gameInfo?.idRoom).emit('server-game-info', {
+                gameInfo: {
+                  ...game,
+                  turn: null,
+                },
+              });
+            }
+          }
+        }
+      }
+
+      const roomPanel = roomList.leaveRoom(room.id, user);
+      user.leaveRoom();
+      user.updateStatus(USER_STATUS.ONLINE);
+      socket.leave(room.id);
+      io.to(room.id).emit('server-send-leave-room', { roomPanel });
       if (usersInRoom.length === 1) {
         roomList.remove(room.id);
         io.sockets.emit('server-send-room-list', {
           listRoom: roomList.transform(),
         });
       }
-      const user = onlineUserList.getUserBySocketId(socket.id);
-      const roomPanel = roomList.leaveRoom(room.id, user);
-      user.leaveRoom();
-      user.updateStatus(USER_STATUS.ONLINE);
-      socket.leave(room.id);
-      io.to(room.id).emit('server-send-leave-room', { roomPanel });
       const userConnects = user.sockets;
       userConnects.forEach((connect) => {
         io.to(connect).emit('server-send-leaved-room', { isLeaveRoom: true });

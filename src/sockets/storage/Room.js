@@ -10,7 +10,7 @@ class Room {
     this.status = 'WAITING';
     this.timePerStep = +timePerStep || 30;
     this.viewingList = [];
-    this.firstStep = 0;
+    this.firstStep = 1;
   }
 
   leave(user) {

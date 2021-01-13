@@ -1,6 +1,8 @@
 import game from 'database/models/game';
 import { onlineUserList, roomList, gameList } from './storage';
 import Game from './storage/Game';
+import { USER_STATUS } from 'utils/constants';
+
 let WinnerCountdown;
 const inGame = (io) => {
   io.on('connection', (socket) => {
@@ -13,17 +15,41 @@ const inGame = (io) => {
       if (isAddGameSuccess) {
         io.to(user.inRoom).emit('server-panel-room-info', { roomPanel });
         io.to(user.inRoom).emit('server-game-info', { gameInfo });
-      }
-      if (user) {
-        if (roomPanel) {
-          let i = roomPanel.getAllUserInRoom().length;
-          WinnerCountdown = setInterval(function () {
-            const gameInfo = gameList.getByRoomId(user.inRoom);
-            if (gameInfo) {
-              io.to(user.inRoom).emit('counter', gameInfo.decreaseTime());
+        gameInfo.interval = setInterval(() => {
+          const gameCurrent = gameInfo.decreaseTime();
+          if (gameCurrent) {
+            if (gameCurrent?.timeLeft === 0) {
+              const first = onlineUserList.getUserById(
+                gameCurrent.firstPlayer.id
+              );
+              const second = onlineUserList.getUserById(
+                gameCurrent.secondPlayer.id
+              );
+              first.updateStatus(USER_STATUS.IN_ROOM);
+              second.updateStatus(USER_STATUS.IN_ROOM);
+
+              let game = gameCurrent.winnerTimeOut();
+              if (game) {
+                if (gameCurrent.turn === 0) {
+                  io.to(gameCurrent?.idRoom).emit('server-game-info', {
+                    gameInfo: {
+                      ...game,
+                      status: `${game.whoWin()?.name} win bruhhh`,
+                    },
+                  });
+                } else {
+                  io.to(gameCurrent?.idRoom).emit('server-game-info', {
+                    gameInfo: {
+                      ...game,
+                      status: `${game.whoWin()?.name} win bruhhh`,
+                    },
+                  });
+                }
+              }
             }
-          }, i * 1000);
-        }
+            io.to(roomPanel.id).emit('server-game-info', { gameInfo });
+          }
+        }, 1000);
       }
     });
 
@@ -38,18 +64,8 @@ const inGame = (io) => {
       }
       clearInterval(WinnerCountdown);
     });
-    socket.on('client-switch-turn', ({ gameId }) => {
-      const user = onlineUserList.getUserBySocketId(socket.id);
-      const gameInfo = gameList.getById(gameId);
 
-      // switch (type) {
-      //   case 'switch-turn':
-      //     gameInfo.switchTurn();
-      // }
-      // io.to(user.inRoom).emit('server-game-info', { gameInfo });
-    });
-
-    socket.on('client-play-chess', ({ position, roomId }) => {
+    socket.on('client-play-chess', async ({ position, roomId }) => {
       const currentRoom = roomList.getById(roomId);
       const currentGame = gameList.getByRoomId(roomId);
       if (currentRoom) {
@@ -59,7 +75,7 @@ const inGame = (io) => {
           boardData,
           winArray,
           turn,
-        } = currentGame.chessAtPosition({
+        } = await currentGame.chessAtPosition({
           position,
           userId: currentPlayer?.id,
         });
@@ -79,13 +95,24 @@ const inGame = (io) => {
     });
 
     socket.on('reset-game', (roomId) => {
-      const game = gameList.getAll();
-      const currentGame = gameList.getByRoomId(roomId);
-      const board = currentGame.resetGame();
-      io.to(roomId).emit('reset-game', board);
+      const game = gameList.getByRoomId(roomId);
+      gameList.remove(game.id);
+      const user = onlineUserList.getUserBySocketId(socket.id);
+      const roomPanel = roomList.getById(roomId);
+      roomPanel.updateStatus('PLAYING');
+      const isAddGameSuccess = gameList.add(roomPanel);
+      const gameInfo = gameList.getByRoomId(roomPanel.id);
+      if (isAddGameSuccess) {
+        io.to(user.inRoom).emit('reset-game');
+        // io.to(user.inRoom).emit('server-panel-room-info', { roomPanel });
+        gameInfo.interval = setInterval(() => {
+          gameInfo.decreaseTime();
+          io.to(roomPanel.id).emit('server-game-info', { gameInfo });
+        }, 1000);
+      }
     });
+
     socket.on('client-request-draw', ({ gameId }) => {
-      console.log('gameId', gameId);
       const user = onlineUserList.getUserBySocketId(socket.id);
       const gameInfo = gameList.getById(gameId);
       const rival = gameInfo.getRival(user);
@@ -108,10 +135,42 @@ const inGame = (io) => {
 
     socket.on('client-accept-request-draw', ({ gameId }) => {
       // TODO: Xử lý hòa
+      const gameInfo = gameList.getById(gameId);
+      if (gameInfo) {
+        const firstPlayer = onlineUserList.getUserById(gameInfo.firstPlayer.id);
+        const secondPlayer = onlineUserList.getUserById(
+          gameInfo.secondPlayer.id
+        );
+        firstPlayer.updateStatus(USER_STATUS.IN_ROOM);
+        secondPlayer.updateStatus(USER_STATUS.IN_ROOM);
+        const gameCallback = gameInfo.gameDraw();
+        io.to(gameInfo?.idRoom).emit('server-game-info', {
+          gameInfo: { ...gameCallback, status: 'Draw' },
+        });
+      }
+      // io.to(gam)
     });
 
     socket.on('client-surrender', ({ gameId }) => {
-      // TODO: Xử lý thua
+      const gameInfo = gameList.getById(gameId);
+      if (gameInfo) {
+        const losePlayer = onlineUserList.getUserBySocketId(socket.id);
+        if (losePlayer) {
+          const game = gameInfo.updateLoser(losePlayer.id);
+          if (game) {
+            const first = onlineUserList.getUserById(game.firstPlayer.id);
+            const second = onlineUserList.getUserById(game.secondPlayer.id);
+            first.updateStatus(USER_STATUS.IN_ROOM);
+            second.updateStatus(USER_STATUS.IN_ROOM);
+            io.to(gameInfo?.idRoom).emit('server-game-info', {
+              gameInfo: {
+                ...game,
+                status: `${game.whoWin()?.name} win bruhhh`,
+              },
+            });
+          }
+        }
+      }
     });
   });
 };

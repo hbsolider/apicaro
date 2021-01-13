@@ -133,14 +133,24 @@ gameService.listGamesByUser = async (id) => {
 };
 
 gameService.createOne = async (data) => {
-  const { id, roomId, firstPlayer, secondPlayer } = data;
-  const newRoom = await Room.create({
+  const { id, idRoom, firstPlayer, secondPlayer } = data;
+  const newGame = await Game.create({
     id,
-    roomId,
-    playerFirst: firstPlayer,
-    playerSecond: secondPlayer,
+    roomId:idRoom,
+    playerFirst: firstPlayer.id,
+    playerSecond: secondPlayer.id,
   });
-  return newRoom;
+  return newGame;
+};
+
+gameService.updateGame = async (data) => {
+  const { id, ...fields } = data;
+  const updatedGame = await Game.update(fields, {
+    where: {
+      id,
+    },
+  });
+  return updatedGame;
 };
 
 export default gameService;

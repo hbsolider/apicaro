@@ -1,7 +1,6 @@
 import { gameService } from 'service';
 import { pick } from 'utils/common';
 import Game from './Game';
-
 class GameList {
   constructor() {
     if (GameList.instance) {

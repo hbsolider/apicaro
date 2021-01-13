@@ -90,10 +90,8 @@ export const ChessAtPosition = ({ room, turn, position }) => {
         Boards[current].xIsNext = true;
       }
       const array2d = ChangeTo2D(Boards[current].data);
-      console.log(array2d);
       const y = Math.floor(position / maxLength);
       const x = position % maxLength;
-      console.log(checkEndGame(array2d, x, y));
       if (checkEndGame(array2d, x, y)) {
         winner = xIsNext ? 'Winner O' : 'Winner X';
       }

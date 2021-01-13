@@ -1,7 +1,7 @@
-"use strict";
+'use strict';
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.createTable("Games", {
+    await queryInterface.createTable('Games', {
       id: {
         allowNull: false,
         primaryKey: true,
@@ -12,8 +12,8 @@ module.exports = {
         allowNull: false,
         type: Sequelize.UUID,
         references: {
-          model: "Rooms",
-          key: "id",
+          model: 'Rooms',
+          key: 'id',
         },
       },
       playerFirst: {
@@ -39,12 +39,12 @@ module.exports = {
         type: Sequelize.DATE,
       },
       completeAt: {
-        allowNull: false,
+        allowNull: true,
         type: Sequelize.DATE,
       },
     });
   },
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.dropTable("Games");
+    await queryInterface.dropTable('Games');
   },
 };

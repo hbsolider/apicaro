@@ -1,6 +1,9 @@
 import { checkEndGame } from 'sockets/game/winOrLose';
 import { v4 as uuidv4 } from 'uuid';
 import { changeTo2D } from '../game/winOrLose';
+import gameService from 'service/game.service';
+import Steps from 'service/step.service';
+
 class Game {
   constructor({ id, firstPlayer, secondPlayer, timePerStep, firstStep }) {
     this.id = uuidv4();
@@ -10,10 +13,60 @@ class Game {
     this.timePerStep = timePerStep;
     this.turn = firstStep;
     this.timeLeft = timePerStep;
-    this.board = Array(20 * 20).fill(null);
+    this.board = Array(20 * 20).fill('');
     this.userWin = null;
     this.completeAt = null;
     this.currentPosition = null;
+    // this.interval = setInterval(() => {
+    //   this.timeLeft -= 1;
+    //   if (this.timeLeft===0) {
+    //     return;
+    //   }
+    // }, 1000);
+    this.interval = null;
+  }
+  winnerTimeOut() {
+    if (this.timeLeft === 0) {
+      this.userWin = this.secondPlayer.id;
+    } else {
+      this.userWin = this.firstPlayer.id;
+    }
+    this.gameEnd();
+    clearInterval(this.interval);
+    return this;
+  }
+  updateLoser(loserId) {
+    if (this.firstPlayer.id === loserId) {
+      this.userWin = this.secondPlayer.id;
+    } else if (this.secondPlayer.id === loserId) {
+      this.userWin = this.firstPlayer.id;
+    }
+    this.gameEnd();
+    clearInterval(this.interval);
+    return this;
+  }
+  gameEnd() {
+    this.completeAt = Date.now();
+    this.timeLeft = this.timePerStep;
+    clearInterval(this.interval);
+    gameService.updateGame(this);
+    return this;
+  }
+
+  gameDraw() {
+    this.completeAt = Date.now();
+    this.board.join();
+    this.timeLeft = this.timePerStep;
+    this.userWin = null;
+    clearInterval(this.interval);
+    gameService.updateGame(this);
+    return this;
+  }
+
+  resetGame() {
+    this.board = Array(20 * 20).fill('');
+    this.userWin = null;
+    return this.board;
   }
 
   setFirstPlayer(firstPlayer) {
@@ -34,12 +87,6 @@ class Game {
     return this.board;
   }
 
-  resetGame() {
-    this.board = Array(20 * 20).fill(null);
-    this.userWin = null;
-    return this.board;
-  }
-
   checkWinner(position) {
     const y = Math.floor(position / 20);
     const x = position % 20;
@@ -52,25 +99,12 @@ class Game {
     };
   }
 
-  chessAtPosition({ position, userId }) {
+  async chessAtPosition({ position, userId }) {
     let winArray = [];
-    if (this.board[position] === null) {
+    if (this.board[position] === '') {
       if (
         this.turn === 1 &&
         userId === this.firstPlayer?.id &&
-        this.userWin === null
-      ) {
-        this.board[position] = 'o';
-        this.currentPosition = position;
-        const { status, winArr } = this.checkWinner(position);
-        if (status) {
-          winArray = new Set(winArr);
-          this.userWin = userId;
-        }
-        this.switchTurn();
-      } else if (
-        this.turn === 0 &&
-        userId === this.secondPlayer?.id &&
         this.userWin === null
       ) {
         this.board[position] = 'x';
@@ -79,12 +113,42 @@ class Game {
         if (status) {
           winArray = new Set(winArr);
           this.userWin = userId;
+          this.gameEnd();
+          this.switchTurn();
         }
+        let board = this.board.join(', ');
+        await Steps.create({
+          userId: this.firstPlayer.id,
+          gameId: this.id,
+          board,
+        });
+        this.switchTurn();
+      } else if (
+        this.turn === 0 &&
+        userId === this.secondPlayer?.id &&
+        this.userWin === null
+      ) {
+        this.board[position] = 'o';
+        this.currentPosition = position;
+        const { status, winArr } = this.checkWinner(position);
+        if (status) {
+          winArray = new Set(winArr);
+          this.userWin = userId;
+          this.gameEnd();
+          this.switchTurn();
+        }
+        let board = this.board.join(', ');
+        await Steps.create({
+          userId: this.secondPlayer.id,
+          gameId: this.id,
+          board,
+        });
         this.switchTurn();
       }
     }
+
     const a = {
-      winner: this.userWin,
+      winner: this.whoWin(),
       boardData: this.board,
       winArray,
       turn: this.turn,
@@ -92,6 +156,15 @@ class Game {
     return a;
   }
 
+  whoWin() {
+    if (this.userWin === this.firstPlayer.id) {
+      return this.firstPlayer;
+    } else if (this.userWin === this.secondPlayer.id) {
+      return this.secondPlayer;
+    } else {
+      return this.userWin;
+    }
+  }
   decreaseTime() {
     if (this.timeLeft === 0) {
       this.gameOver();
@@ -99,7 +172,7 @@ class Game {
     if (this.timeLeft > 0) {
       this.timeLeft = this.timeLeft - 1;
     }
-    return this.timeLeft;
+    return this;
   }
 
   requestDraw(user) {

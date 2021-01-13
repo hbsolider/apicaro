@@ -5,8 +5,8 @@ const inHistory = (io) => {
   io.on('connection', (socket) => {
     socket.on('client-get-history', async ({ gameId }) => {
       const gameInfo = await gameService.getOneById(gameId);
-      socket.emit('server-send-game-history', { gameInfo });
-    });
+    socket.emit('server-send-game-history', { gameInfo });
+  });
   });
 };
 

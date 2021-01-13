@@ -19,7 +19,7 @@ module.exports = {
           updatedAt: new Date('2021-01-12T20:27:08'),
           completeAt: new Date('2021-01-12T21:27:08'),
         },
-        ...game,
+        // ...game,
       ],
       {}
     );
