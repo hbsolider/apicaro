@@ -9,7 +9,7 @@ describe('GET /status', () => {
       .expect(httpStatus.OK)
       .then((res) => {
         const { message } = res.body;
-        expect(message).toBe('OK');
+        expect(message).toBe('OK!');
       });
   });
 });
