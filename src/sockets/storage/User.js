@@ -12,6 +12,10 @@ class User {
     this.inRoom = '';
     this.sockets = [];
   }
+  
+  checkInFirstSocket(socketId) {
+    return !!(socketId === socketId[0]);
+  }
 
   clone({
     id,

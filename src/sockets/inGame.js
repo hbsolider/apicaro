@@ -1,7 +1,7 @@
 import game from 'database/models/game';
 import { onlineUserList, roomList, gameList } from './storage';
 import Game from './storage/Game';
-
+let WinnerCountdown;
 const inGame = (io) => {
   io.on('connection', (socket) => {
     socket.on('client-create-game', () => {
@@ -14,14 +14,30 @@ const inGame = (io) => {
         io.to(user.inRoom).emit('server-panel-room-info', { roomPanel });
         io.to(user.inRoom).emit('server-game-info', { gameInfo });
       }
+      if (user) {
+        if (roomPanel) {
+          let i = roomPanel.getAllUserInRoom().length;
+          WinnerCountdown = setInterval(function () {
+            const gameInfo = gameList.getByRoomId(user.inRoom);
+            if (gameInfo) {
+              io.to(user.inRoom).emit('counter', gameInfo.decreaseTime());
+            }
+          }, i * 1000);
+        }
+      }
     });
-    setInterval(() => {
+
+    socket.on('game-over', (id) => {
       const user = onlineUserList.getUserBySocketId(socket.id);
       if (user) {
-        const game = gameList.getByRoomId(user.inRoom);
-        if (game) io.to(user.inRoom).emit('decrease-time', game.decreaseTime());
+        const check = user.checkInFirstSocket(socket.id);
+        if (check) {
+          const gameInfo = gameList.getByRoomId(id);
+          io.to(user.inRoom).emit('server-game-over', gameInfo.gameOver());
+        }
       }
-    }, 1000);
+      clearInterval(WinnerCountdown);
+    });
     socket.on('client-switch-turn', ({ gameId }) => {
       const user = onlineUserList.getUserBySocketId(socket.id);
       const gameInfo = gameList.getById(gameId);

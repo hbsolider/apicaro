@@ -93,6 +93,9 @@ class Game {
   }
 
   decreaseTime() {
+    if (this.timeLeft === 0) {
+      this.gameOver();
+    }
     if (this.timeLeft > 0) {
       this.timeLeft = this.timeLeft - 1;
     }
@@ -111,6 +114,15 @@ class Game {
       return this.secondPlayer;
     }
     return this.firstPlayer;
+  }
+
+  gameOver() {
+    this.timeLeft = this.timePerStep;
+    if (this.turn) {
+      return this.firstPlayer;
+    } else {
+      return this.secondPlayer;
+    }
   }
 }
 
