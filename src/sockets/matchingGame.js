@@ -44,9 +44,11 @@ const matchingGame = (io) => {
 
     socket.on('client-send-matching-game', () => {
       const user = onlineUserList.getUserBySocketId(socket.id);
-      user.updateStatus(USER_STATUS.SEARCHING);
-      const userList = onlineUserList.transform();
-      io.sockets.emit('server-send-user-list', { userList });
+      if (user) {
+        user.updateStatus(USER_STATUS.SEARCHING);
+        const userList = onlineUserList.transform();
+        io.sockets.emit('server-send-user-list', { userList });
+      }
     });
 
     socket.on('client-send-cancel-matching-game', () => {
@@ -93,7 +95,10 @@ const matchingGame = (io) => {
         case USER_RANK.MASTER:
           if (queueMaster.isEmpty() && !rank) {
             queueMaster.enqueue(user);
-          } else if (!queueMaster.isEmpty()) {
+          } else if (
+            !queueMaster.isEmpty() &&
+            queueMaster.front()?.id !== user.id
+          ) {
             isMatched = true;
             playerFirst = queueMaster.dequeue();
           }
@@ -101,7 +106,10 @@ const matchingGame = (io) => {
         case USER_RANK.DIAMOND:
           if (queueDiamond.isEmpty() && !rank) {
             queueDiamond.enqueue(user);
-          } else if (!queueDiamond.isEmpty()) {
+          } else if (
+            !queueDiamond.isEmpty() &&
+            queueDiamond.front()?.id !== user.id
+          ) {
             isMatched = true;
             playerFirst = queueDiamond.dequeue();
           }
@@ -109,7 +117,10 @@ const matchingGame = (io) => {
         case USER_RANK.PLATINUM:
           if (queuePlatium.isEmpty() && !rank) {
             queuePlatium.enqueue(user);
-          } else if (!queuePlatium.isEmpty()) {
+          } else if (
+            !queuePlatium.isEmpty() &&
+            queuePlatium.front()?.id !== user.id
+          ) {
             isMatched = true;
             playerFirst = queuePlatium.dequeue();
           }
@@ -117,7 +128,10 @@ const matchingGame = (io) => {
         case USER_RANK.GOLD:
           if (queueGold.isEmpty() && !rank) {
             queueGold.enqueue(user);
-          } else if (!queueGold.isEmpty()) {
+          } else if (
+            !queueGold.isEmpty() &&
+            queueGold.front()?.id !== user.id
+          ) {
             isMatched = true;
             playerFirst = queueGold.dequeue();
           }
@@ -125,7 +139,10 @@ const matchingGame = (io) => {
         case USER_RANK.SILVER:
           if (queueSilver.isEmpty() && !rank) {
             queueSilver.enqueue(user);
-          } else if (!queueSilver.isEmpty()) {
+          } else if (
+            !queueSilver.isEmpty() &&
+            queueSilver.front()?.id !== user.id
+          ) {
             isMatched = true;
             playerFirst = queueSilver.dequeue();
           }
@@ -133,7 +150,10 @@ const matchingGame = (io) => {
         case USER_RANK.BRONZE:
           if (queueBronze.isEmpty() && !rank) {
             queueBronze.enqueue(user);
-          } else if (!queueBronze.isEmpty()) {
+          } else if (
+            !queueBronze.isEmpty() &&
+            queueBronze.front()?.id !== user.id
+          ) {
             isMatched = true;
             playerFirst = queueBronze.dequeue();
           }

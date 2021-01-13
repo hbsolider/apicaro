@@ -32,18 +32,19 @@ const getRoomList = (io) => {
 
     socket.on('client-leave-room', ({ room }) => {
       const usersInRoom = roomList.getAllUserRoomId(room.id);
+      const user = onlineUserList.getUserBySocketId(socket.id);
+      const roomPanel = roomList.leaveRoom(room.id, user);
+      user.leaveRoom();
+      socket.leave(room.id);
+      io.to(room.id).emit('server-send-leave-room', { roomPanel });
+
       if (usersInRoom.length === 1) {
         roomList.remove(room.id);
         io.sockets.emit('server-send-room-list', {
           listRoom: roomList.transform(),
         });
       }
-      const user = onlineUserList.getUserBySocketId(socket.id);
-      const roomPanel = roomList.leaveRoom(room.id, user);
-      user.leaveRoom();
       user.updateStatus(USER_STATUS.ONLINE);
-      socket.leave(room.id);
-      io.to(room.id).emit('server-send-leave-room', { roomPanel });
       const userConnects = user.sockets;
       userConnects.forEach((connect) => {
         io.to(connect).emit('server-send-leaved-room', { isLeaveRoom: true });
