@@ -50,19 +50,19 @@ class Game {
     clearInterval(this.interval);
     return this;
   }
-  gameEnd() {
+  async gameEnd() {
     this.completeAt = Date.now();
     this.timeLeft = this.timePerStep;
     clearInterval(this.interval);
-    gameService.updateGame(this);
+    await gameService.updateGame(this);
     const winPlayer = this.whoWin();
     const losePlayer = this.whoLose();
     const pointGet = calPointGet(winPlayer.point, losePlayer.point);
-    userService.updatePoint({
+    await userService.updatePoint({
       ...winPlayer,
       point: winPlayer.point + pointGet,
     });
-    userService.updatePoint({
+    await userService.updatePoint({
       ...losePlayer,
       point: losePlayer.point - pointGet,
     });
