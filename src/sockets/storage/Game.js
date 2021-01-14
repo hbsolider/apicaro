@@ -66,6 +66,7 @@ class Game {
       ...losePlayer,
       point: losePlayer.point - pointGet,
     });
+    this.currentPosition = null;
     return this;
   }
 
