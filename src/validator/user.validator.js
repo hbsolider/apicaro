@@ -34,3 +34,9 @@ export const validateRequestRecovery = {
     secretKey: Joi.string().required(),
   }),
 };
+
+export const validateGetAllInfo = {
+  params: Joi.object({
+    id: Joi.string().required(),
+  }),
+};

@@ -9,16 +9,17 @@ const {
   verify,
   forgotPassword,
   resetPassword,
+  getAllInfo,
 } = require('../controller/user.controller');
 import {
   validateVerify,
   validateDecodeKey,
   validateForgotPassword,
   validateRequestRecovery,
+  validateGetAllInfo,
 } from 'validator/user.validator';
 import validate from 'middleware/validate';
 
-// const auth = require('../middleware/auth')
 router.get('/', auth(ROLES.ADMIN), getAllUser);
 router.patch('/', errorHandle(updateInfo));
 router.post('/rate', errorHandle(getHistory));
@@ -34,4 +35,11 @@ router.post(
   validate(validateRequestRecovery),
   errorHandle(resetPassword)
 );
+router.get(
+  '/:id',
+  validate(validateGetAllInfo),
+  auth(),
+  errorHandle(getAllInfo)
+);
+
 module.exports = router;

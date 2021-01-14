@@ -1,13 +1,14 @@
-const { User } = require('../database/models');
+const { User, Game } = require('../database/models');
+const { Op } = require('sequelize');
 const jwt = require('jsonwebtoken');
 const BadRequest = require('../utils/badRequest');
+
 import { validateInfomation } from 'validator/user.validator';
 import userService from 'service/user.service';
 import {
   sendMailActiveAccount,
   sendMailResetPassword,
 } from 'config/nodemailer';
-import { reset } from 'nodemon';
 
 module.exports = {
   async getAllUser(req, res) {
@@ -120,5 +121,32 @@ module.exports = {
       id,
     });
     return res.send(user);
+  },
+
+  async getAllInfo(req, res) {
+    const { id } = req.params;
+    const user = await User.findOne({
+      attributes: {
+        exclude: ['password'],
+      },
+      where: {
+        id,
+      },
+    });
+    const totalMatches = await Game.findAndCountAll({
+      where: {
+        [Op.or]: [{ playerFirst: user.id }, { playerSecond: user.id }],
+      },
+    });
+    const winMatches = await Game.findAndCountAll({
+      where: {
+        userWin: user.id,
+      },
+    });
+    return res.send({
+      ...user?.dataValues,
+      totalMatches: totalMatches?.count,
+      winMatches: winMatches?.count,
+    });
   },
 };
