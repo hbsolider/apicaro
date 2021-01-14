@@ -13,6 +13,7 @@ const inGame = (io) => {
         io.to(user.inRoom).emit('server-panel-room-info', { roomPanel });
         io.to(user.inRoom).emit('server-game-info', { gameInfo });
         gameInfo.interval = setInterval(() => {
+          console.log('hihiiiiiiiiiiiiiiiiiiiiiiiiiiiii');
           const gameCurrent = gameInfo.decreaseTime();
           if (gameCurrent) {
             if (gameCurrent?.timeLeft === 0) {
@@ -94,7 +95,39 @@ const inGame = (io) => {
         io.to(user.inRoom).emit('reset-game');
         // io.to(user.inRoom).emit('server-panel-room-info', { roomPanel });
         gameInfo.interval = setInterval(() => {
-          gameInfo.decreaseTime();
+          const gameCurrent = gameInfo.decreaseTime();
+          if (gameCurrent) {
+            if (gameCurrent?.timeLeft === 0) {
+              const first = onlineUserList.getUserById(
+                gameCurrent.firstPlayer.id
+              );
+              const second = onlineUserList.getUserById(
+                gameCurrent.secondPlayer.id
+              );
+              first.updateStatus(USER_STATUS.IN_ROOM);
+              second.updateStatus(USER_STATUS.IN_ROOM);
+
+              let game = gameCurrent.winnerTimeOut();
+              if (game) {
+                if (gameCurrent.turn === 0) {
+                  io.to(gameCurrent?.idRoom).emit('server-game-info', {
+                    gameInfo: {
+                      ...game,
+                      status: `${game.whoWin()?.name} win bruhhh`,
+                    },
+                  });
+                } else {
+                  io.to(gameCurrent?.idRoom).emit('server-game-info', {
+                    gameInfo: {
+                      ...game,
+                      status: `${game.whoWin()?.name} win bruhhh`,
+                    },
+                  });
+                }
+              }
+            }
+            io.to(roomPanel.id).emit('server-game-info', { gameInfo });
+          }
           io.to(roomPanel.id).emit('server-game-info', { gameInfo });
         }, 1000);
       }
