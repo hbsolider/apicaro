@@ -50,7 +50,6 @@ const inGame = (io) => {
       }
     });
 
-
     socket.on('client-play-chess', async ({ position, roomId }) => {
       const currentRoom = roomList.getById(roomId);
       const currentGame = gameList.getByRoomId(roomId);
@@ -61,6 +60,7 @@ const inGame = (io) => {
           boardData,
           winArray,
           turn,
+          currentPosition,
         } = await currentGame.chessAtPosition({
           position,
           userId: currentPlayer?.id,
@@ -71,10 +71,12 @@ const inGame = (io) => {
             boardData,
             winArray: [...winArray],
             turn,
+            currentPosition,
           });
         } else {
+          console.log('currentPosition', currentPosition);
           io.to(roomId).emit('server-game-info', {
-            gameInfo: { board: boardData, turn },
+            gameInfo: { board: boardData, turn, currentPosition },
           });
         }
       }

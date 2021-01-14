@@ -57,10 +57,7 @@ class Game {
     gameService.updateGame(this);
     const winPlayer = this.whoWin();
     const losePlayer = this.whoLose();
-    const pointGet = calPointGet(
-      winPlayer.point,
-      losePlayer.point
-    );
+    const pointGet = calPointGet(winPlayer.point, losePlayer.point);
     userService.updatePoint({
       ...winPlayer,
       point: winPlayer.point + pointGet,
@@ -171,6 +168,7 @@ class Game {
       boardData: this.board,
       winArray,
       turn: this.turn,
+      currentPosition: this.currentPosition,
     };
     return a;
   }
