@@ -1,9 +1,6 @@
-import game from 'database/models/game';
 import { onlineUserList, roomList, gameList } from './storage';
-import Game from './storage/Game';
 import { USER_STATUS } from 'utils/constants';
 
-let WinnerCountdown;
 const inGame = (io) => {
   io.on('connection', (socket) => {
     socket.on('client-create-game', () => {
@@ -53,17 +50,6 @@ const inGame = (io) => {
       }
     });
 
-    socket.on('game-over', (id) => {
-      const user = onlineUserList.getUserBySocketId(socket.id);
-      if (user) {
-        const check = user.checkInFirstSocket(socket.id);
-        if (check) {
-          const gameInfo = gameList.getByRoomId(id);
-          io.to(user.inRoom).emit('server-game-over', gameInfo.gameOver());
-        }
-      }
-      clearInterval(WinnerCountdown);
-    });
 
     socket.on('client-play-chess', async ({ position, roomId }) => {
       const currentRoom = roomList.getById(roomId);
@@ -148,7 +134,6 @@ const inGame = (io) => {
           gameInfo: { ...gameCallback, status: 'Draw' },
         });
       }
-      // io.to(gam)
     });
 
     socket.on('client-surrender', ({ gameId }) => {

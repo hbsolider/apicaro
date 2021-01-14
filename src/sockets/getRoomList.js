@@ -33,8 +33,11 @@ const getRoomList = (io) => {
     socket.on('client-leave-room', ({ room }) => {
       const usersInRoom = roomList.getAllUserRoomId(room.id);
       const user = onlineUserList.getUserBySocketId(socket.id);
-      if (user?.status === USER_STATUS.PLAYING) {
-        const gameInfo = gameList.getByRoomId(room.id);
+      const gameInfo = gameList.getByRoomId(room.id);
+      if (
+        user?.id === gameInfo?.firstPlayer?.id ||
+        user?.id === gameInfo?.secondPlayer?.id
+      ) {
         if (gameInfo) {
           const losePlayer = onlineUserList.getUserBySocketId(socket.id);
           if (losePlayer) {
@@ -49,6 +52,7 @@ const getRoomList = (io) => {
                 gameInfo: {
                   ...game,
                   turn: null,
+                  status: null,
                 },
               });
             }

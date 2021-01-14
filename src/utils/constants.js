@@ -23,3 +23,11 @@ export const USER_RANK = {
   DIAMOND: 'DIAMOND',
   MASTER: 'MASTER',
 };
+export const RANKS = [
+  'BRONZE',
+  'SILVER',
+  'GOLD',
+  'PLATINUM',
+  'DIAMOND',
+  'MASTER',
+];
