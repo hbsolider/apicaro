@@ -3,6 +3,8 @@ import { v4 as uuidv4 } from 'uuid';
 import { changeTo2D } from '../game/winOrLose';
 import gameService from 'service/game.service';
 import Steps from 'service/step.service';
+import calPointGet from 'utils/calPointGet';
+import userService from 'service/user.service';
 
 class Game {
   constructor({ id, firstPlayer, secondPlayer, timePerStep, firstStep }) {
@@ -24,6 +26,9 @@ class Game {
     //   }
     // }, 1000);
     this.interval = null;
+  }
+  updateWinnerNull() {
+    this.userWin = null;
   }
   winnerTimeOut() {
     if (this.timeLeft === 0) {
@@ -50,6 +55,20 @@ class Game {
     this.timeLeft = this.timePerStep;
     clearInterval(this.interval);
     gameService.updateGame(this);
+    const winPlayer = this.whoWin();
+    const losePlayer = this.whoLose();
+    const pointGet = calPointGet(
+      winPlayer.point,
+      losePlayer.point
+    );
+    userService.updatePoint({
+      ...winPlayer,
+      point: winPlayer.point + pointGet,
+    });
+    userService.updatePoint({
+      ...losePlayer,
+      point: losePlayer.point - pointGet,
+    });
     return this;
   }
 
@@ -165,6 +184,15 @@ class Game {
       return this.userWin;
     }
   }
+
+  whoLose() {
+    if (this.userWin === this.firstPlayer.id) {
+      return this.secondPlayer;
+    } else if (this.userWin === this.secondPlayer.id) {
+      return this.firstPlayer;
+    }
+  }
+
   decreaseTime() {
     if (this.timeLeft === 0) {
       this.gameOver();

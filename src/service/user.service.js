@@ -140,4 +140,15 @@ userService.changePassword = async ({ email, password, id }) => {
   });
   return dataValues.email;
 };
+
+userService.updatePoint = async (data) => {
+  const { id, ...fields } = data;
+  const updatedPoint = await User.update(fields, {
+    where: {
+      id,
+    },
+  });
+  return updatedPoint;
+};
+
 export default userService;
