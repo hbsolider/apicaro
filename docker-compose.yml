@@ -13,6 +13,11 @@ services:
       JWT_SECRET: anhem1nha
       JWT_EXPIRATION_MINUTES: 30
       JWT_REFRESH_EXPIRATION_DAYS: 30
+      clientIdGoogle: 853693305449-be25ff2ni0t2ve7cb6hm5jvhpcm3aju4.apps.googleusercontent.com
+      clientSecret: _CZDkxwHH0p2Dt0Rjl2iNRME
+      nodeEmail: peterpans2030@gmail.com
+      nodePassword: anhchien01
+      clientUrl: http://68.183.239.178:6969/
     command: sh -c "./wait-for-it.sh database:5432 && npm run migrate && npm run migrate:seed && pm2-runtime ecosystem.config.js"
     ports:
       - 6969:6969

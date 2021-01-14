@@ -5,7 +5,7 @@ const chatRoom = (io) => {
   io.on('connection', (socket) => {
     const user = onlineUserList.getUserBySocketId(socket.id);
 
-    socket.on('client-join-wait-room', async ({ roomId }) => {
+    socket.on('client-check-pass-room-and-join', async ({ roomId }) => {
       const user = onlineUserList.getUserBySocketId(socket.id);
       const isJoinRoomSuccess = user.joinRoom(roomId);
       const messages = await messageService.getManyByRoomId(roomId);
