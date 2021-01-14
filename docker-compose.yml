@@ -17,7 +17,7 @@ services:
       clientSecret: _CZDkxwHH0p2Dt0Rjl2iNRME
       nodeEmail: peterpans2030@gmail.com
       nodePassword: anhchien01
-      clientUrl: http://68.183.239.178:6969/
+      clientUrl: http://caro.cf/
       nodeMailerRefreshToken: 1//048FPtRayEspjCgYIARAAGAQSNwF-L9IrrjzwuAgOWVGnZdHuhvSMLUhKlOD3u4tVMNGK37cM1s7Uyy2lG1Lvg-9I37igN2zMiIQ
     command: sh -c "./wait-for-it.sh database:5432 && npm run migrate && npm run migrate:seed && pm2-runtime ecosystem.config.js"
     ports:
