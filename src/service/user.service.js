@@ -141,12 +141,14 @@ userService.changePassword = async ({ email, password, id }) => {
   return dataValues.email;
 };
 
-userService.updatePoint = async (data) => {
-  const { id, ...fields } = data;
-  const updatedPoint = await User.update(fields, {
+userService.updatePoint = async ({ id, point }) => {
+  const user = await User.findOne({
     where: {
       id,
     },
+  });
+  const updatedPoint = await user.update({
+    point,
   });
   return updatedPoint;
 };

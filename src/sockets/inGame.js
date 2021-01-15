@@ -85,51 +85,53 @@ const inGame = (io) => {
 
     socket.on('reset-game', (roomId) => {
       const game = gameList.getByRoomId(roomId);
-      gameList.remove(game.id);
-      const user = onlineUserList.getUserBySocketId(socket.id);
-      const roomPanel = roomList.getById(roomId);
-      roomPanel.updateStatus('PLAYING');
-      const isAddGameSuccess = gameList.add(roomPanel);
-      const gameInfo = gameList.getByRoomId(roomPanel.id);
-      if (isAddGameSuccess) {
-        io.to(user.inRoom).emit('reset-game');
-        // io.to(user.inRoom).emit('server-panel-room-info', { roomPanel });
-        gameInfo.interval = setInterval(() => {
-          const gameCurrent = gameInfo.decreaseTime();
-          if (gameCurrent) {
-            if (gameCurrent?.timeLeft === 0) {
-              const first = onlineUserList.getUserById(
-                gameCurrent.firstPlayer.id
-              );
-              const second = onlineUserList.getUserById(
-                gameCurrent.secondPlayer.id
-              );
-              first.updateStatus(USER_STATUS.IN_ROOM);
-              second.updateStatus(USER_STATUS.IN_ROOM);
+      if (game) {
+        gameList.remove(game.id);
+        const user = onlineUserList.getUserBySocketId(socket.id);
+        const roomPanel = roomList.getById(roomId);
+        roomPanel.updateStatus('PLAYING');
+        const isAddGameSuccess = gameList.add(roomPanel);
+        const gameInfo = gameList.getByRoomId(roomPanel.id);
+        if (isAddGameSuccess) {
+          io.to(user.inRoom).emit('reset-game');
+          // io.to(user.inRoom).emit('server-panel-room-info', { roomPanel });
+          gameInfo.interval = setInterval(() => {
+            const gameCurrent = gameInfo.decreaseTime();
+            if (gameCurrent) {
+              if (gameCurrent?.timeLeft === 0) {
+                const first = onlineUserList.getUserById(
+                  gameCurrent.firstPlayer.id
+                );
+                const second = onlineUserList.getUserById(
+                  gameCurrent.secondPlayer.id
+                );
+                first.updateStatus(USER_STATUS.IN_ROOM);
+                second.updateStatus(USER_STATUS.IN_ROOM);
 
-              let game = gameCurrent.winnerTimeOut();
-              if (game) {
-                if (gameCurrent.turn === 0) {
-                  io.to(gameCurrent?.idRoom).emit('server-game-info', {
-                    gameInfo: {
-                      ...game,
-                      status: `${game.whoWin()?.name} win bruhhh`,
-                    },
-                  });
-                } else {
-                  io.to(gameCurrent?.idRoom).emit('server-game-info', {
-                    gameInfo: {
-                      ...game,
-                      status: `${game.whoWin()?.name} win bruhhh`,
-                    },
-                  });
+                let game = gameCurrent.winnerTimeOut();
+                if (game) {
+                  if (gameCurrent.turn === 0) {
+                    io.to(gameCurrent?.idRoom).emit('server-game-info', {
+                      gameInfo: {
+                        ...game,
+                        status: `${game.whoWin()?.name} win bruhhh`,
+                      },
+                    });
+                  } else {
+                    io.to(gameCurrent?.idRoom).emit('server-game-info', {
+                      gameInfo: {
+                        ...game,
+                        status: `${game.whoWin()?.name} win bruhhh`,
+                      },
+                    });
+                  }
                 }
               }
+              io.to(roomPanel.id).emit('server-game-info', { gameInfo });
             }
             io.to(roomPanel.id).emit('server-game-info', { gameInfo });
-          }
-          io.to(roomPanel.id).emit('server-game-info', { gameInfo });
-        }, 1000);
+          }, 1000);
+        }
       }
     });
 

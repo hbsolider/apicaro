@@ -32,9 +32,11 @@ class Game {
   }
   winnerTimeOut() {
     if (this.timeLeft === 0) {
-      this.userWin = this.secondPlayer.id;
-    } else {
-      this.userWin = this.firstPlayer.id;
+      if (this.turn === 0) {
+        this.userWin = this.firstPlayer.id;
+      } else {
+        this.userWin = this.secondPlayer.id;
+      }
     }
     this.gameEnd();
     clearInterval(this.interval);
@@ -57,14 +59,17 @@ class Game {
     await gameService.updateGame(this);
     const winPlayer = this.whoWin();
     const losePlayer = this.whoLose();
-    const pointGet = calPointGet(winPlayer.point, losePlayer.point);
+
+    const pointWin = await userService.getUserById(winPlayer.id);
+    const pointLose = await userService.getUserById(losePlayer.id);
+    const pointGet = calPointGet(pointWin.point, pointLose.point);
     await userService.updatePoint({
-      ...winPlayer,
-      point: winPlayer.point + pointGet,
+      id: pointWin.id,
+      point: pointWin.point + pointGet,
     });
     await userService.updatePoint({
-      ...losePlayer,
-      point: losePlayer.point - pointGet,
+      id: pointLose.id,
+      point: pointLose.point - pointGet,
     });
     this.currentPosition = null;
     return this;
@@ -131,7 +136,7 @@ class Game {
           winArray = new Set(winArr);
           this.userWin = userId;
           this.gameEnd();
-          this.switchTurn();
+          // this.switchTurn();
         }
         let board = this.board.join(', ');
         await Steps.create({
@@ -152,7 +157,7 @@ class Game {
           winArray = new Set(winArr);
           this.userWin = userId;
           this.gameEnd();
-          this.switchTurn();
+          // this.switchTurn();
         }
         let board = this.board.join(', ');
         await Steps.create({
